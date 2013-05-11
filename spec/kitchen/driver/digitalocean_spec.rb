@@ -187,7 +187,7 @@ describe Kitchen::Driver::Digitalocean do
     let(:config) do
       {
         :digitalocean_client_id => 'Aife3ahkii4oot9oowai',
-        :digitalocean_api_key => 'yahsh4aesh3oov9daiWacheeka4Thi9thie7zoh9'
+        :digitalocean_api_key => 'yahsh4aesh3oov9daiWach'
       }
     end
 
@@ -200,7 +200,7 @@ describe Kitchen::Driver::Digitalocean do
     end
 
     context 'no client id provided' do
-      let(:config) { { :digitalocean_api_key => 'yahsh4aesh3oov9daiWacheeka4Thi9thie7zoh9' } }
+      let(:config) { { :digitalocean_api_key => 'yahsh4aesh3oov9daiWach' } }
 
       it 'raises an error' do
         expect { driver.send(:compute) }.to raise_error(ArgumentError)
