@@ -7,11 +7,11 @@ Gem::Specification.new do |spec|
   spec.name          = 'kitchen-digitalocean'
   spec.version       = Kitchen::Driver::DIGITALOCEAN_VERSION
   spec.authors       = ['Greg Fitzgerald']
-  spec.email         = ['greg@Gregf.org']
+  spec.email         = ['greg@gregf.org']
   spec.description   = %q{A Test Kitchen Digital Ocean driver}
   spec.summary       = spec.description
   spec.homepage      = 'https://github.com/gregf/kitchen-digitalocean'
-  spec.license       = 'Apache'
+  spec.license       = 'Apache 2.0'
 
   spec.files         = `git ls-files`.split($/)
   spec.executables   = spec.files.grep(%r{^bin/}) { |f| File.basename(f) }
