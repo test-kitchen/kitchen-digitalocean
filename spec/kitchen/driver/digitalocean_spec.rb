@@ -62,7 +62,7 @@ describe Kitchen::Driver::Digitalocean do
       end
 
       it 'defaults to New York region id' do
-        expect(driver[:region_id]).to eq(1)
+        expect(driver[:region_id]).to eq('1')
       end
     end
 
@@ -102,12 +102,11 @@ describe Kitchen::Driver::Digitalocean do
       d
     end
 
-    context 'Client ID API key, and Region ID only provided' do
+    context 'Client ID and API key only provided' do
       let(:config) do
         {
           :digitalocean_client_id => 'Quei4zaey9nijiexoong',
           :digitalocean_api_key => 'Eep4eidaiz7chohd4cheyei9peigooyoa9Ek4sua',
-          :region_id => '1'
         }
       end
 

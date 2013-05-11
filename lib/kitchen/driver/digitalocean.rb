@@ -32,7 +32,7 @@ module Kitchen
       default_config :flavor_id, '66'
       default_config :name, nil
       default_config :ssh_key_ids, nil
-      default_config :region_id, 1
+      default_config :region_id, '1'
       default_config :username, 'root'
       default_config :port, '22'
       default_config :sudo, false
@@ -72,11 +72,11 @@ module Kitchen
 
       def create_server
         compute.servers.create(
-          :name             => config[:name],
-          :image_id         => config[:image_id],
-          :flavor_id        => config[:flavor_id],
-          :region_id        => config[:region_id],
-          :ssh_key_ids      => config[:ssh_key_ids]
+          :name         => config[:name],
+          :image_id     => config[:image_id],
+          :flavor_id    => config[:flavor_id],
+          :region_id    => config[:region_id],
+          :ssh_key_ids  => config[:ssh_key_ids]
         )
       end
 
