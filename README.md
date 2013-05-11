@@ -32,13 +32,13 @@ Provide, at a minimum, the required driver options in your `.kitchen.yml` file:
       require_chef_omnibus: latest (if you'll be using Chef)
 
 By default, the driver will spawn a 512MB Ubuntu 12.10 instance in the New York
-Digital Ocean . Additional, optional settings can be provided:
+region. Additional, optional settings can be provided:
 
     image_id: [SERVER IMAGE ID]
     flavor_id: [SERVER FLAVOR ID]
     name: [A UNIQUE SERVER NAME]
     region_id: [A VALID DIGITAL OCEAN REGION ID]
-    ssh_key_ids: [SSH KEY ID FROM DIGITAL OCEAN]
+    ssh_key_ids: [COMMA SEPERATED SSH KEY IDS FROM DIGITAL OCEAN]
 
 ### List of Regions
 
