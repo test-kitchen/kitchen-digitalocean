@@ -41,10 +41,11 @@ module Kitchen
         config[:name] ||= generate_name(instance.name)
         server = create_server
         state[:server_id] = server.id
+
         info("Digital Ocean instance <#{state[:server_id]}> created.")
-        server.wait_for { ready? } ; puts "(server ready)"
+        server.wait_for { print "."; ready? } ; print "(server ready)"
         state[:hostname] = server.ip_address
-        wait_for_sshd(state[:hostname]) ; puts "(ssh ready)"
+        wait_for_sshd(state[:hostname]) ; print "(ssh ready)\n"
       rescue Fog::Errors::Error, Excon::Errors::Error => ex
         raise ActionFailed, ex.message
       end
