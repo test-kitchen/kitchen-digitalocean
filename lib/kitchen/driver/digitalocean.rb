@@ -43,7 +43,7 @@ module Kitchen
         state[:server_id] = server.id
 
         info("Digital Ocean instance <#{state[:server_id]}> created.")
-        server.wait_for { print "."; ready? } ; print "(server ready)"
+        server.wait_for { print '.'; ready? } ; print '(server ready)'
         state[:hostname] = server.ip_address
         wait_for_sshd(state[:hostname]) ; print "(ssh ready)\n"
         debug("digitalocean:create #{state[:hostname]}")
@@ -67,9 +67,9 @@ module Kitchen
         debug_compute_config
 
         server_def = {
-          :provider               => "Digitalocean",
-          :digitalocean_api_key   => config[:digitalocean_api_key],
-          :digitalocean_client_id => config[:digitalocean_client_id]
+          provider:               :digitalocean,
+          digitalocean_api_key:   config[:digitalocean_api_key],
+          digitalocean_client_id: config[:digitalocean_client_id]
         }
         Fog::Compute.new(server_def)
       end
@@ -78,11 +78,11 @@ module Kitchen
         debug_server_config
 
         compute.servers.create(
-          :name         => config[:name],
-          :image_id     => config[:image_id],
-          :flavor_id    => config[:flavor_id],
-          :region_id    => config[:region_id],
-          :ssh_key_ids  => config[:ssh_key_ids]
+          name:         config[:name],
+          image_id:     config[:image_id],
+          flavor_id:    config[:flavor_id],
+          region_id:    config[:region_id],
+          ssh_key_ids:  config[:ssh_key_ids]
         )
       end
 

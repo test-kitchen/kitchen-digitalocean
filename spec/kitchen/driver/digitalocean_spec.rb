@@ -29,7 +29,7 @@ describe Kitchen::Driver::Digitalocean do
   let(:state) { Hash.new }
 
   let(:instance) do
-    stub(:name => 'potatoes', :logger => logger, :to_str => 'instance')
+    stub(name: 'potatoes', logger: logger, to_str: 'instance')
   end
 
   let(:driver) do
@@ -69,13 +69,13 @@ describe Kitchen::Driver::Digitalocean do
     context 'overridden options' do
       let(:config) do
         {
-          :image_id => '2676',
-          :flavor_id => '63',
-          :ssh_key_ids => '1234',
-          :username => 'admin',
-          :port => '2222',
-          :name => 'puppy',
-          :region_id => '3'
+          image_id: '2676',
+          flavor_id: '63',
+          ssh_key_ids: '1234',
+          username: 'admin',
+          port: '2222',
+          name: 'puppy',
+          region_id: '3'
         }
       end
 
@@ -90,8 +90,8 @@ describe Kitchen::Driver::Digitalocean do
 
   describe '#create' do
     let(:server) do
-      stub(:id => 'test123', :wait_for => true,
-        :ip_address => '1.2.3.4')
+      stub(id: 'test123', wait_for: true,
+        ip_address: '1.2.3.4')
     end
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
@@ -105,8 +105,8 @@ describe Kitchen::Driver::Digitalocean do
     context 'Client ID and API key only provided' do
       let(:config) do
         {
-          :digitalocean_client_id => 'Quei4zaey9nijiexoong',
-          :digitalocean_api_key => 'Eep4eidaiz7chohd4cheyei9peigooyoa9Ek4sua',
+          digitalocean_client_id: 'Quei4zaey9nijiexoong',
+          digitalocean_api_key: 'Eep4eidaiz7chohd4cheyei9peigooyoa9Ek4sua',
         }
       end
 
@@ -130,10 +130,10 @@ describe Kitchen::Driver::Digitalocean do
   describe '#destroy' do
     let(:server_id) { '12345' }
     let(:hostname) { 'example.com' }
-    let(:state) { { :server_id => server_id, :hostname => hostname } }
-    let(:server) { stub(:nil? => false, :destroy => true) }
-    let(:servers) { stub(:get => server) }
-    let(:compute) { stub(:servers => servers) }
+    let(:state) { { server_id: server_id, hostname: hostname } }
+    let(:server) { stub(nil?: false, destroy: true) }
+    let(:servers) { stub(get: server) }
+    let(:compute) { stub(servers: servers) }
 
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
@@ -167,7 +167,7 @@ describe Kitchen::Driver::Digitalocean do
         s.stub(:get).with('12345').and_return(nil)
         s
       end
-      let(:compute) { stub(:servers => servers) }
+      let(:compute) { stub(servers: servers) }
       let(:driver) do
         d = Kitchen::Driver::Digitalocean.new(config)
         d.instance = instance
@@ -185,21 +185,21 @@ describe Kitchen::Driver::Digitalocean do
   describe '#compute' do
     let(:config) do
       {
-        :digitalocean_client_id => 'Aife3ahkii4oot9oowai',
-        :digitalocean_api_key => 'yahsh4aesh3oov9daiWach'
+        digitalocean_client_id: 'Aife3ahkii4oot9oowai',
+        digitalocean_api_key: 'yahsh4aesh3oov9daiWach'
       }
     end
 
     context 'all requirements provided' do
       it 'creates a new compute connection' do
         Fog::Compute.stub(:new) { |arg| arg }
-        res = config.merge({ :provider => 'Digitalocean' })
+        res = config.merge({ provider: :digitalocean })
         expect(driver.send(:compute)).to eq(res)
       end
     end
 
     context 'no client id provided' do
-      let(:config) { { :digitalocean_api_key => 'yahsh4aesh3oov9daiWach' } }
+      let(:config) { { digitalocean_api_key: 'yahsh4aesh3oov9daiWach' } }
 
       it 'raises an error' do
         expect { driver.send(:compute) }.to raise_error(ArgumentError)
@@ -207,7 +207,7 @@ describe Kitchen::Driver::Digitalocean do
     end
 
     context 'no API key provided' do
-      let(:config) { { :digitalocean_client_id => 'Aife3ahkii4oot9oowai' } }
+      let(:config) { { digitalocean_client_id: 'Aife3ahkii4oot9oowai' } }
 
       it 'raises an error' do
         expect { driver.send(:compute) }.to raise_error(ArgumentError)
@@ -215,7 +215,7 @@ describe Kitchen::Driver::Digitalocean do
     end
 
     context 'no region id provided' do
-      let(:config) { { :region_id => '1' } }
+      let(:config) { { region_id: '1' } }
 
       it 'raises an error' do
         expect { driver.send(:compute) }.to raise_error(ArgumentError)
@@ -227,11 +227,11 @@ describe Kitchen::Driver::Digitalocean do
   describe '#create_server' do
     let(:config) do
       {
-        :name => 'hello',
-        :image_id => '2047',
-        :flavor_id => '66',
-        :ssh_key_ids => '1234',
-        :region_id => '1'
+        name: 'hello',
+        image_id: '2047',
+        flavor_id: '66',
+        ssh_key_ids: '1234',
+        region_id: '1'
       }
     end
     before(:each) { @config = config.dup }
@@ -240,7 +240,7 @@ describe Kitchen::Driver::Digitalocean do
       s.stub(:create) { |arg| arg }
       s
     end
-    let(:compute) { stub(:servers => servers) }
+    let(:compute) { stub(servers: servers) }
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
       d.instance = instance
