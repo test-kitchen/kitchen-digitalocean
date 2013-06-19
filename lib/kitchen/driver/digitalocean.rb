@@ -46,6 +46,7 @@ module Kitchen
         server.wait_for { print "."; ready? } ; print "(server ready)"
         state[:hostname] = server.ip_address
         wait_for_sshd(state[:hostname]) ; print "(ssh ready)\n"
+        debug("digitalocean:create #{state[:hostname]}")
       rescue Fog::Errors::Error, Excon::Errors::Error => ex
         raise ActionFailed, ex.message
       end
@@ -63,6 +64,8 @@ module Kitchen
       private
 
       def compute
+        debug_compute_config
+
         server_def = {
           :provider               => "Digitalocean",
           :digitalocean_api_key   => config[:digitalocean_api_key],
@@ -72,6 +75,8 @@ module Kitchen
       end
 
       def create_server
+        debug_server_config
+
         compute.servers.create(
           :name         => config[:name],
           :image_id     => config[:image_id],
@@ -85,6 +90,19 @@ module Kitchen
         # Generate what should be a unique server name
         rand_str = Array.new(8) { rand(36).to_s(36) }.join
         "#{base}-#{Etc.getlogin}-#{Socket.gethostname}-#{rand_str}"
+      end
+
+      def debug_server_config
+        debug("digitalocean:name #{config[:name]}")
+        debug("digitalocean:image_id #{config[:image_id]}")
+        debug("digitalocean:flavor_id #{config[:flavor_id]}")
+        debug("digitalocean:region_id #{config[:region_id]}")
+        debug("digitalocean:ssh_key_ids #{config[:ssh_key_ids]}")
+      end
+
+      def debug_compute_config
+        debug("digitalocean_api_key #{config[:digitalocean_api_key]}")
+        debug("digitalocean_client_id #{config[:digitalocean_client_id]}")
       end
     end
   end
