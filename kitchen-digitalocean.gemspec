@@ -18,8 +18,8 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'test-kitchen', '~> 1.0.0.alpha'
-  spec.add_dependency 'fog', '~> 1.12'
+  spec.add_dependency 'test-kitchen', '~> 1.0.0.beta.2'
+  spec.add_dependency 'fog', '~> 1.14'
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'rake'
