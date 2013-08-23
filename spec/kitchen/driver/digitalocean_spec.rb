@@ -91,7 +91,7 @@ describe Kitchen::Driver::Digitalocean do
   describe '#create' do
     let(:server) do
       stub(id: 'test123', wait_for: true,
-        ip_address: '1.2.3.4')
+        public_ip_address: '1.2.3.4')
     end
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
