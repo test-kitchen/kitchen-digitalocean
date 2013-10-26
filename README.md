@@ -47,9 +47,10 @@ ID  Name
 1   New York 1
 2   Amsterdam 1
 3   San Francisco 1
+4	New York 2
 ```
 
-### List of Flavors
+### List of Images
 ```shell
 ID      Distribution  Name                      Global
 249545  Arch Linux    Arch Linux 2013.03 x32    +
@@ -86,7 +87,7 @@ ID      Distribution  Name                      Global
 25489   Ubuntu        Ubuntu 12.10 x64 Server   +
 ```
 
-### List of Sizes
+### List of Flavors (Sizes)
 ```shell
 ID  Name
 63  1GB
