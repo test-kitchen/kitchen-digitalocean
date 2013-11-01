@@ -90,8 +90,8 @@ describe Kitchen::Driver::Digitalocean do
 
   describe '#create' do
     let(:server) do
-      stub(id: 'test123', wait_for: true,
-        public_ip_address: '1.2.3.4')
+      stub('id' => 'test123', 'wait_for' => true,
+           'public_ip_address' => '1.2.3.4')
     end
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
@@ -193,7 +193,7 @@ describe Kitchen::Driver::Digitalocean do
     context 'all requirements provided' do
       it 'creates a new compute connection' do
         Fog::Compute.stub(:new) { |arg| arg }
-        res = config.merge({ provider: :digitalocean })
+        res = config.merge(provider: :digitalocean)
         expect(driver.send(:compute)).to eq(res)
       end
     end
