@@ -1,3 +1,9 @@
+# 0.2.1 / 2013-10-31
+
+* Update example tables in the readme
+* Fix warning for public_ip_address
+* [@dpetzel](https://github.com/dpetzel) [PR #1] flip flavor and image
+
 # 0.2.0 / 2013-06-19
 
 * Provide debug output for test-kitchen
