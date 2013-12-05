@@ -1,5 +1,5 @@
-# -*- encoding: utf-8 -*-
 #
+# -*- encoding: utf-8 -*-
 # Author:: Greg Fitzgerald (<greg@gregf.org>)
 #
 # Copyright (C) 2013, Greg Fitzgerald
@@ -29,7 +29,7 @@ describe Kitchen::Driver::Digitalocean do
   let(:state) { Hash.new }
 
   let(:instance) do
-    stub(name: 'potatoes', logger: logger, to_str: 'instance')
+    double(name: 'potatoes', logger: logger, to_str: 'instance')
   end
 
   let(:driver) do
@@ -90,7 +90,7 @@ describe Kitchen::Driver::Digitalocean do
 
   describe '#create' do
     let(:server) do
-      stub('id' => 'test123', 'wait_for' => true,
+      double('id' => 'test123', 'wait_for' => true,
            'public_ip_address' => '1.2.3.4')
     end
     let(:driver) do
@@ -131,9 +131,9 @@ describe Kitchen::Driver::Digitalocean do
     let(:server_id) { '12345' }
     let(:hostname) { 'example.com' }
     let(:state) { { server_id: server_id, hostname: hostname } }
-    let(:server) { stub(nil?: false, destroy: true) }
-    let(:servers) { stub(get: server) }
-    let(:compute) { stub(servers: servers) }
+    let(:server) { double(nil?: false, destroy: true) }
+    let(:servers) { double(get: server) }
+    let(:compute) { double(servers: servers) }
 
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
@@ -167,7 +167,7 @@ describe Kitchen::Driver::Digitalocean do
         s.stub(:get).with('12345').and_return(nil)
         s
       end
-      let(:compute) { stub(servers: servers) }
+      let(:compute) { double(servers: servers) }
       let(:driver) do
         d = Kitchen::Driver::Digitalocean.new(config)
         d.instance = instance
@@ -240,7 +240,7 @@ describe Kitchen::Driver::Digitalocean do
       s.stub(:create) { |arg| arg }
       s
     end
-    let(:compute) { stub(servers: servers) }
+    let(:compute) { double(servers: servers) }
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
       d.instance = instance
