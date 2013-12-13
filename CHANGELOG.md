@@ -1,3 +1,8 @@
+# 0.3.0 / 2013-12-12
+
+* Fix deprecation warnings from rspec 3
+* Bump test-kitchen dependency to ~> 1.1.0
+
 # 0.2.1 / 2013-10-31
 
 * Update example tables in the readme
