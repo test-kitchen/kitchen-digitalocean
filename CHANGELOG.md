@@ -1,3 +1,7 @@
+# 0.3.1 / 2013-12-29
+
+* [@someara](https://github.com/someara) [PR #2] Relax test-kitchen version dep
+
 # 0.3.0 / 2013-12-12
 
 * Fix deprecation warnings from rspec 3
