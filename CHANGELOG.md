@@ -1,3 +1,10 @@
+# 0.4.0 / 2013-12-31
+
+* Updated the driver for test kitchen 1.1, fixed some bugs.
+* Improved documentation
+* It will now read your api key, client id, and ssh key ids, from environment variables if set.
+* You can specify the image name rather than the image id
+
 # 0.3.1 / 2013-12-29
 
 * [@someara](https://github.com/someara) [PR #2] Relax test-kitchen version dep
