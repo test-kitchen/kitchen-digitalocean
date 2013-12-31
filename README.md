@@ -97,7 +97,7 @@ example:
 
 # Authors
 
-Created and maintained by [Greg Fitzgerald][https://github.com/gregf/] (<greg@gregf.org>)
+Created and maintained by [Greg Fitzgerald](https://github.com/gregf/) (<greg@gregf.org>)
 
 # License
 
