@@ -13,7 +13,40 @@ There are no external system requirements for this driver. However you will need
 
 # Installation and Setup
 
-Please read the [Driver usage](http://docs.kitchen-ci.org/drivers/usage) page for more details.
+You'll need to install the gem on your development machine.
+
+```Bash
+gem install kitchen-digitalocean
+```
+
+or add it to your Gemfile if you are using [Bundler](http://bundler.io/)
+
+```ruby
+source https://rubygems.org
+
+gem 'test-kitchen'
+gem 'kitchen-digitalocean'
+```
+
+At minimum, you'll need to tell test-kitchen to use the digitalocean driver.
+
+```ruby
+---
+driver:
+  - name: digitalocean
+platforms:
+  - name: ubuntu-12-10
+```
+
+You also have the option of providing some configs via environment variables.
+
+```bash
+export DIGITALOCEAN_CLIENT_ID="1234"
+export DIGITALOCEAN_API_KEY="5678"
+export SSH_KEY_IDS="1234, 5678"
+```
+
+Please refer to the [Getting Started Guide](http://kitchen.ci/) for any further documentation.
 
 # Default Configuration
 
@@ -65,7 +98,6 @@ ID  Name
 3   San Francisco 1
 4   New York 2
 ```
-
 ### List of Flavors (Sizes)
 ```shell
 ID  Name
