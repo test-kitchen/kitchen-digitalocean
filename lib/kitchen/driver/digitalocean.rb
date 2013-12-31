@@ -116,7 +116,7 @@ module Kitchen
         )
       end
 
-       def images
+      def images
         @images ||= begin
           json_file = File.expand_path(
             File.join(%w{.. .. .. .. data images.json}),
