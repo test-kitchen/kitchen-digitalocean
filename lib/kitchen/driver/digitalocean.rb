@@ -28,17 +28,36 @@ module Kitchen
     #
     # @author Greg Fitzgerald <greg@gregf.org>
     class Digitalocean < Kitchen::Driver::SSHBase
-      default_config :image_id, '25489'
       default_config :flavor_id, '66'
-      default_config :name, nil
-      default_config :ssh_key_ids, nil
       default_config :region_id, '1'
       default_config :username, 'root'
       default_config :port, '22'
-      default_config :sudo, false
+
+      default_config :image_id do |driver|
+        driver.default_image
+      end
+
+      default_config :server_name do |driver|
+        driver.default_name
+      end
+
+      default_config :digitalocean_client_id do |driver|
+        ENV['DIGITALOCEAN_CLIENT_ID']
+      end
+
+      default_config :digitalocean_api_key do |driver|
+        ENV['DIGITALOCEAN_API_KEY']
+      end
+
+      default_config :ssh_key_ids do |driver|
+        ENV['SSH_KEY_IDS']
+      end
+
+      required_config :digitalocean_client_id
+      required_config :digitalocean_api_key
+      required_config :ssh_key_ids
 
       def create(state)
-        config[:name] ||= generate_name(instance.name)
         server = create_server
         state[:server_id] = server.id
 
@@ -61,16 +80,27 @@ module Kitchen
         state.delete(:hostname)
       end
 
+      def default_image
+        images[instance.platform.name]
+      end
+
+      def default_name
+        # Generate what should be a unique server name
+        rand_str = Array.new(8) { rand(36).to_s(36) }.join
+        "#{instance.name}-#{Etc.getlogin}-#{Socket.gethostname}-#{rand_str}"
+      end
+
       private
 
       def compute
         debug_compute_config
 
         server_def = {
-          provider:               :digitalocean,
+          provider:               'Digitalocean',
           digitalocean_api_key:   config[:digitalocean_api_key],
           digitalocean_client_id: config[:digitalocean_client_id]
         }
+
         Fog::Compute.new(server_def)
       end
 
@@ -78,7 +108,7 @@ module Kitchen
         debug_server_config
 
         compute.servers.create(
-          name:         config[:name],
+          name:         config[:server_name],
           image_id:     config[:image_id],
           flavor_id:    config[:flavor_id],
           region_id:    config[:region_id],
@@ -86,14 +116,18 @@ module Kitchen
         )
       end
 
-      def generate_name(base)
-        # Generate what should be a unique server name
-        rand_str = Array.new(8) { rand(36).to_s(36) }.join
-        "#{base}-#{Etc.getlogin}-#{Socket.gethostname}-#{rand_str}"
+       def images
+        @images ||= begin
+          json_file = File.expand_path(
+            File.join(%w{.. .. .. .. data images.json}),
+            __FILE__
+          )
+          JSON.load(IO.read(json_file))
+        end
       end
 
       def debug_server_config
-        debug("digitalocean:name #{config[:name]}")
+        debug("digitalocean:name #{config[:server_name]}")
         debug("digitalocean:image_id #{config[:image_id]}")
         debug("digitalocean:flavor_id #{config[:flavor_id]}")
         debug("digitalocean:region_id #{config[:region_id]}")

@@ -2,43 +2,59 @@
 
 # Kitchen::Digitalocean
 
-A Digital Ocean driver for Test Kitchen 1.0!
+A Test Kitchen Driver for Digital Ocean
 
 Shamelessly copied from [RoboticCheese](https://github.com/RoboticCheese)'s
 awesome work on an [Rackspace driver](https://github.com/RoboticCheese/kitchen-rackspace).
 
-## Installation
+# Requirements
 
-Add this line to your application's Gemfile:
+There are no external system requirements for this driver. However you will need access to an [DigitalOcean](https://digitalocean.com/) account.
 
-    gem 'kitchen-digitalocean'
+# Installation and Setup
 
-And then execute:
+Please read the [Driver usage](http://docs.kitchen-ci.org/drivers/usage) page for more details.
 
-    $ bundle
+# Default Configuration
 
-Or install it yourself as:
+This driver can determine the image_id for a select number of platforms in each region. Currently, the following platform names are supported:
 
-    $ gem install kitchen-digitalocean
+```ruby
+---
+platforms:
+- name: ubuntu-10.04
+- name: ubuntu-12.10
+- name: ubuntu-13.04
+- name: ubuntu-13.10
+- name: centos-5.8
+- name: centos-6.4
+- name: centos-6.5
+- name: debian-6.0
+- name: debian-7.0
+- name: fedora-17
+- name: fedora-19
+- name: archlinux-2013.05
+```
 
-## Usage
+This will effectively generate a configuration similar to:
 
-Provide, at a minimum, the required driver options in your `.kitchen.yml` file:
+```ruby
+---
+platforms:
+- name: ubuntu-10.04
+  driver_config:
+    image_id: 14097
+- name: ubuntu-12.10
+  driver_config:
+    image_id: 473123
+# ...
+- name: centos-5.8
+  driver_config:
+    image_id: 1601
+# ...
+```
 
-    driver_plugin: digitalocean
-    driver_config:
-      digitalocean_client_id: [YOUR DIGITAL OCEAN CLIENT ID]
-      digitalocean_api_key: [YOUR DIGITAL OCEAN API KEY]
-      require_chef_omnibus: latest (if you'll be using Chef)
-
-By default, the driver will spawn a 512MB Ubuntu 12.10 instance in the New York
-region. Additional, optional settings can be provided:
-
-    image_id: [SERVER IMAGE ID]
-    flavor_id: [SERVER FLAVOR ID]
-    name: [A UNIQUE SERVER NAME]
-    region_id: [A VALID DIGITAL OCEAN REGION ID]
-    ssh_key_ids: [COMMA SEPERATED SSH KEY IDS FROM DIGITAL OCEAN]
+For specific default values, please consult [images.json](https://github.com/gregf/kitchen-digitalocean/blob/master/data/images.json).
 
 ### List of Regions
 
@@ -48,46 +64,6 @@ ID  Name
 2   Amsterdam 1
 3   San Francisco 1
 4   New York 2
-```
-
-### List of Images
-```shell
-ID       Distribution  Name
-361740   Arch Linux    Arch Linux 2013.05 x32
-350424   Arch Linux    Arch Linux 2013.05 x64
-1602     CentOS        CentOS 5.8 x32
-1601     CentOS        CentOS 5.8 x64
-376568   CentOS        CentOS 6.4 x32
-562354   CentOS        CentOS 6.4 x64
-12575    Debian        Debian 6.0 x32
-12573    Debian        Debian 6.0 x64
-303619   Debian        Debian 7.0 x32
-308287   Debian        Debian 7.0 x64
-32387    Fedora        Fedora 17 x32
-32399    Fedora        Fedora 17 x32 Desktop
-32428    Fedora        Fedora 17 x64
-32419    Fedora        Fedora 17 x64 Desktop
-697056   Fedora        Fedora 19 x86
-696598   Fedora        Fedora 19 x86-64
-1004145  Ubuntu        Docker on Ubuntu 13.04 x64
-959207   Ubuntu        Ghost 0.3.3 on Ubuntu 12.04
-459444   Ubuntu        LAMP on Ubuntu 12.04
-483575   Ubuntu        Redmine on Ubuntu 12.04
-464235   Ubuntu        Ruby on Rails on Ubuntu 12.10 (Nginx + Unicorn)
-14098    Ubuntu        Ubuntu 10.04 x32
-14097    Ubuntu        Ubuntu 10.04 x64
-284211   Ubuntu        Ubuntu 12.04 x32
-284203   Ubuntu        Ubuntu 12.04 x64
-1015250  Ubuntu        Ubuntu 12.04.3 x32
-1015253  Ubuntu        Ubuntu 12.04.3 x64
-433240   Ubuntu        Ubuntu 12.10 x32
-473123   Ubuntu        Ubuntu 12.10 x64
-473136   Ubuntu        Ubuntu 12.10 x64 Desktop
-345791   Ubuntu        Ubuntu 13.04 x32
-350076   Ubuntu        Ubuntu 13.04 x64
-962304   Ubuntu        Ubuntu 13.10 x32
-961965   Ubuntu        Ubuntu 13.10 x64
-1061995  Ubuntu        Wordpress on Ubuntu 12.10
 ```
 
 ### List of Flavors (Sizes)
@@ -104,11 +80,25 @@ ID  Name
 68  96GB
 66  512MB
 ```
+# Development
 
-## Contributing
+* Source hosted at [GitHub](https://github.com/gregf/kitchen-digitalocean)
+* Report issues/questions/feature requests on [GitHub Issues](https://github.com/gregf/kitchen-digitalocean/issues)
 
-1. Fork it
+Pull requests are very welcome! Make sure your patches are well tested.
+Ideally create a topic branch for every separate change you make. For
+example:
+
+1. Fork the repo
 2. Create your feature branch (`git checkout -b my-new-feature`)
-3. Commit your changes (`git commit -am 'Add some feature'`)
+3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+# Authors
+
+Created and maintained by [Greg Fitzgerald][https://github.com/gregf/] (<greg@gregf.org>)
+
+# License
+
+Apache 2.0 (see [LICENSE](https://github.com/gregf/kitchen-digitalocean/blob/master/LICENSE.txt))
