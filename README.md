@@ -87,7 +87,7 @@ platforms:
 # ...
 ```
 
-Your flavor\_id and region\_id can automatically set from the more friendly options flavor and region like so.
+`flavor\_id` and `region\_id` can be set from the more friendly options flavor, and region like so.
 
 ```ruby
 driver:
