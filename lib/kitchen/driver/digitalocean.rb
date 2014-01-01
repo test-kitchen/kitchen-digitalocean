@@ -87,7 +87,8 @@ module Kitchen
       end
 
       def default_flavor
-        data['flavors'].fetch(config[:flavor] ? config[:flavor].upcase : nil) { '66' }
+        flavor = config[:flavor] ? config[:flavor].upcase : nil
+        data['flavors'].fetch(flavor) { '66' }
       end
 
       def default_region
