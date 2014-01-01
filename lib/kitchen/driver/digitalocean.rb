@@ -28,10 +28,16 @@ module Kitchen
     #
     # @author Greg Fitzgerald <greg@gregf.org>
     class Digitalocean < Kitchen::Driver::SSHBase
-      default_config :flavor_id, '66'
-      default_config :region_id, '1'
       default_config :username, 'root'
       default_config :port, '22'
+
+      default_config :region_id do |driver|
+        driver.default_region
+      end
+
+      default_config :flavor_id do |driver|
+        driver.default_flavor
+      end
 
       default_config :image_id do |driver|
         driver.default_image
@@ -80,8 +86,20 @@ module Kitchen
         state.delete(:hostname)
       end
 
+      def default_flavor
+        data['flavors'].fetch(config[:flavor] ? config[:flavor].upcase : nil) { '66' }
+      end
+
+      def default_region
+        regions = {}
+        data['regions'].each_pair do |key, value|
+          regions[key.upcase] = value
+        end
+        regions.fetch(config[:region] ? config[:region].upcase : nil) { '1' }
+      end
+
       def default_image
-        images[instance.platform.name]
+        data['images'].fetch(instance.platform.name) { '473123' }
       end
 
       def default_name
@@ -116,10 +134,10 @@ module Kitchen
         )
       end
 
-      def images
-        @images ||= begin
+      def data
+        @data ||= begin
           json_file = File.expand_path(
-            File.join(%w{.. .. .. .. data images.json}),
+            File.join(%w{.. .. .. .. data digitalocean.json}),
             __FILE__
           )
           JSON.load(IO.read(json_file))

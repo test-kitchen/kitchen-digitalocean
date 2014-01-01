@@ -107,7 +107,8 @@ describe Kitchen::Driver::Digitalocean do
         :username => 'admin',
         :port => '2222',
         :server_name => 'puppy',
-        :region_id => '3'
+        :region_id => '1',
+        :flavor => '1GB'
       }
 
       let(:config) { config }
@@ -255,8 +256,8 @@ describe Kitchen::Driver::Digitalocean do
       {
         :server_name => 'hello',
         :image_id => 'there',
-        :flavor_id => 'captain',
-        :region_id => '1',
+        :flavor_id => '68',
+        :region_id => '3',
         :ssh_key_ids => '1234'
       }
     end
@@ -281,6 +282,26 @@ describe Kitchen::Driver::Digitalocean do
 
     it 'creates the server using a compute connection' do
       expect(driver.send(:create_server)).to eq(@expected)
+    end
+  end
+
+  describe 'Region and Flavor names should be converted to IDs' do
+    let(:config) do
+      {
+        :server_name => 'hello',
+        :image_id => 'there',
+        :flavor => '2gb',
+        :region => 'amsterdam 2',
+        :ssh_key_ids => '1234'
+      }
+    end
+
+    it 'defaults to the correct flavor ID' do
+      expect(driver[:flavor_id]).to eq('62')
+    end
+
+    it 'defaults to the correct region ID' do
+      expect(driver[:region_id]).to eq('5')
     end
   end
 
