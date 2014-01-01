@@ -106,29 +106,6 @@ driver:
 
 For specific default values, please consult [images.json](https://github.com/gregf/kitchen-digitalocean/blob/master/data/digitalocean.json).
 
-### List of Regions
-
-```shell
-ID  Name
-1   New York 1
-2   Amsterdam 1
-3   San Francisco 1
-4   New York 2
-```
-### List of Flavors (Sizes)
-```shell
-ID  Name
-63  1GB
-62  2GB
-64  4GB
-65  8GB
-61  16GB
-60  32GB
-70  48GB
-69  64GB
-68  96GB
-66  512MB
-```
 # Development
 
 * Source hosted at [GitHub](https://github.com/gregf/kitchen-digitalocean)
