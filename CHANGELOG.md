@@ -1,3 +1,8 @@
+# 0.5.0 / 2013-12-31
+
+* You can alternatively use region and flavor options instead of their _id counter parts.
+  See the readme for more information.
+
 # 0.4.0 / 2013-12-31
 
 * Updated the driver for test kitchen 1.1, fixed some bugs.
