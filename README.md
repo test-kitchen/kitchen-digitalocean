@@ -87,7 +87,24 @@ platforms:
 # ...
 ```
 
-For specific default values, please consult [images.json](https://github.com/gregf/kitchen-digitalocean/blob/master/data/images.json).
+Your flavor\_id and region\_id can automatically set from the more friendly options flavor and region like so.
+
+```ruby
+driver:
+- region: amsterdam 2
+- flavor: 8GB
+```
+
+This will generate a configuration similiar to:
+
+```ruby
+---
+driver:
+- region_id: 5
+- flavor: 65
+```
+
+For specific default values, please consult [images.json](https://github.com/gregf/kitchen-digitalocean/blob/master/data/digitalocean.json).
 
 ### List of Regions
 
