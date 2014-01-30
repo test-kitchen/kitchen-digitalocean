@@ -35,7 +35,7 @@ At minimum, you'll need to tell test-kitchen to use the digitalocean driver.
 driver:
   - name: digitalocean
 platforms:
-  - name: ubuntu-12-10
+  - name: ubuntu-12.10
 ```
 
 You also have the option of providing some configs via environment variables.
