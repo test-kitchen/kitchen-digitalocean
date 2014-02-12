@@ -1,3 +1,8 @@
+# 0.5.1 / 2014-02-11
+
+* Add new Singapore 1 region
+* Fixed up the readme
+
 # 0.5.0 / 2013-12-31
 
 * You can alternatively use region and flavor options instead of their _id counter parts.
