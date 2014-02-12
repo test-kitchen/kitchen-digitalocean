@@ -38,7 +38,7 @@ platforms:
   - name: ubuntu-12.10
 ```
 
-You also have the option of providing some configs via environment variables.
+You also have the option of providing your credentials from environment variables.
 
 ```bash
 export DIGITALOCEAN_CLIENT_ID="1234"
@@ -104,12 +104,12 @@ driver:
 - flavor: 65
 ```
 
-For specific default values, please consult [images.json](https://github.com/gregf/kitchen-digitalocean/blob/master/data/digitalocean.json).
+For specific default values, please consult [digitalocean.json](https://github.com/test-kitchen/kitchen-digitalocean/blob/master/data/digitalocean.json).
 
 # Development
 
-* Source hosted at [GitHub](https://github.com/gregf/kitchen-digitalocean)
-* Report issues/questions/feature requests on [GitHub Issues](https://github.com/gregf/kitchen-digitalocean/issues)
+* Source hosted at [GitHub](https://github.com/test-kitchen/kitchen-digitalocean)
+* Report issues/questions/feature requests on [GitHub Issues](https://github.com/test-kitchen/kitchen-digitalocean/issues)
 
 Pull requests are very welcome! Make sure your patches are well tested.
 Ideally create a topic branch for every separate change you make. For
@@ -127,4 +127,4 @@ Created and maintained by [Greg Fitzgerald](https://github.com/gregf/) (<greg@gr
 
 # License
 
-Apache 2.0 (see [LICENSE](https://github.com/gregf/kitchen-digitalocean/blob/master/LICENSE.txt))
+Apache 2.0 (see [LICENSE](https://github.com/test-kitchen/kitchen-digitalocean/blob/master/LICENSE.txt))
