@@ -46,6 +46,13 @@ export DIGITALOCEAN_API_KEY="5678"
 export SSH_KEY_IDS="1234, 5678"
 ```
 
+Note that your `SSH_KEY_ID` must be the numeric id of your ssh key, not the symbolic name. To get the numeric ID
+of your keys, use something like to following command to get them from the digital ocean API:
+
+```bash
+wget -q -O- https://api.digitalocean.com/ssh_keys/?client_id=[YOUR_CLIENT_ID]&api_key=[YOUR_API_KEY]
+```
+
 Please refer to the [Getting Started Guide](http://kitchen.ci/) for any further documentation.
 
 # Default Configuration
