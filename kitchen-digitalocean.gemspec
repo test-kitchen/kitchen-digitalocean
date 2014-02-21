@@ -8,9 +8,9 @@ Gem::Specification.new do |spec|
   spec.version       = Kitchen::Driver::DIGITALOCEAN_VERSION
   spec.authors       = ['Greg Fitzgerald']
   spec.email         = ['greg@gregf.org']
-  spec.description   = %q{A Test Kitchen Digital Ocean driver}
+  spec.description   = 'Kitchen::Driver::DigitalOcean - A Test Kitchen Driver for Digital Ocean'
   spec.summary       = spec.description
-  spec.homepage      = 'https://github.com/gregf/kitchen-digitalocean'
+  spec.homepage      = 'https://github.com/test-kitchen/kitchen-digitalocean'
   spec.license       = 'Apache 2.0'
 
   spec.files         = `git ls-files`.split($/)
