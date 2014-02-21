@@ -1,3 +1,8 @@
+# 0.5.2 / 2014-02-20
+
+* [@lamont-granquist](https://github.com/lamont-granquist) [PR #5] add info on using numeric key ids.
+* [@mattwhite](https://github.com/mattwhite) [PR #6] Add Ubuntu 12.04 support.
+
 # 0.5.1 / 2014-02-11
 
 * Add new Singapore 1 region
