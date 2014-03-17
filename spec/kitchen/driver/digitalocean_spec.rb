@@ -67,7 +67,7 @@ describe Kitchen::Driver::Digitalocean do
       end
 
       it 'defaults to region id 1' do
-        expect(driver[:region_id]).to eq('1')
+        expect(driver[:region_id]).to eq('4')
       end
 
       it 'defaults to SSH Key Ids from $SSH_KEY_IDS' do
@@ -258,6 +258,7 @@ describe Kitchen::Driver::Digitalocean do
         :image_id => 'there',
         :flavor_id => '68',
         :region_id => '3',
+        :private_networking => true,
         :ssh_key_ids => '1234'
       }
     end

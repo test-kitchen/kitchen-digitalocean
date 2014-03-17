@@ -31,6 +31,10 @@ module Kitchen
       default_config :username, 'root'
       default_config :port, '22'
 
+      default_config :private_networking do |driver|
+        true
+      end
+
       default_config :region_id do |driver|
         driver.default_region
       end
@@ -96,7 +100,7 @@ module Kitchen
         data['regions'].each_pair do |key, value|
           regions[key.upcase] = value
         end
-        regions.fetch(config[:region] ? config[:region].upcase : nil) { '1' }
+        regions.fetch(config[:region] ? config[:region].upcase : nil) { '4' }
       end
 
       def default_image
@@ -127,11 +131,12 @@ module Kitchen
         debug_server_config
 
         compute.servers.create(
-          name:         config[:server_name],
-          image_id:     config[:image_id],
-          flavor_id:    config[:flavor_id],
-          region_id:    config[:region_id],
-          ssh_key_ids:  config[:ssh_key_ids]
+          name:               config[:server_name],
+          image_id:           config[:image_id],
+          flavor_id:          config[:flavor_id],
+          region_id:          config[:region_id],
+          ssh_key_ids:        config[:ssh_key_ids],
+          private_networking: config[:private_networking]
         )
       end
 
@@ -151,6 +156,7 @@ module Kitchen
         debug("digitalocean:flavor_id #{config[:flavor_id]}")
         debug("digitalocean:region_id #{config[:region_id]}")
         debug("digitalocean:ssh_key_ids #{config[:ssh_key_ids]}")
+        debug("digitalocean:private_networking s#{config[:private_networking]}")
       end
 
       def debug_compute_config
