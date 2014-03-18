@@ -1,3 +1,8 @@
+# 0.6.0 / 2014-3-17
+
+* Private Networking is now enabled by default. This only works in select regions.
+* The default region was changed to New York 2, so private networking would work by default.
+
 # 0.5.2 / 2014-02-20
 
 * [@lamont-granquist](https://github.com/lamont-granquist) [PR #5] add info on using numeric key ids.

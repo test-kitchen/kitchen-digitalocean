@@ -113,6 +113,17 @@ driver:
 
 For specific default values, please consult [digitalocean.json](https://github.com/test-kitchen/kitchen-digitalocean/blob/master/data/digitalocean.json).
 
+# Private Networking
+
+Private networking is enabled by default, but will only work in certain regions. You can disable private networking by changing private_networking to
+false. Example below.
+
+```ruby
+---
+driver:
+  - private_networking: false
+```
+
 # Development
 
 * Source hosted at [GitHub](https://github.com/test-kitchen/kitchen-digitalocean)
