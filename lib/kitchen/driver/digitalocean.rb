@@ -143,7 +143,7 @@ module Kitchen
       def data
         @data ||= begin
           json_file = File.expand_path(
-            File.join(%w{.. .. .. .. data digitalocean.json}),
+            File.join(%w(.. .. .. .. data digitalocean.json)),
             __FILE__
           )
           JSON.load(IO.read(json_file))
@@ -156,7 +156,7 @@ module Kitchen
         debug("digitalocean:flavor_id #{config[:flavor_id]}")
         debug("digitalocean:region_id #{config[:region_id]}")
         debug("digitalocean:ssh_key_ids #{config[:ssh_key_ids]}")
-        debug("digitalocean:private_networking s#{config[:private_networking]}")
+        debug("digitalocean:private_networking #{config[:private_networking]}")
       end
 
       def debug_compute_config
