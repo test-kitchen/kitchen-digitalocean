@@ -87,7 +87,7 @@ describe Kitchen::Driver::Digitalocean do
       let(:platform_name) { 'ubuntu-12.10' }
 
       it 'defaults to the correct image ID' do
-        expect(driver[:image_id]).to eq('473123')
+        expect(driver[:image_id]).to eq('3101891')
       end
     end
 
