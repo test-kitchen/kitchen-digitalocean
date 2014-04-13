@@ -1,4 +1,8 @@
-# 0.6.0 / 2014-3-17
+# 0.6.1 / 2014-04-12
+
+* [@juliandunn](https://github.com/juliandunn) [PR #9] DigitalOcean updated some images so the IDs required fixing.
+
+# 0.6.0 / 2014-03-17
 
 * Private Networking is now enabled by default. This only works in select regions.
 * The default region was changed to New York 2, so private networking would work by default.
