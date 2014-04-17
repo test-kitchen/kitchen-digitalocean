@@ -22,6 +22,9 @@ require 'kitchen'
 require 'etc'
 require 'socket'
 
+require 'dotenv'
+Dotenv.load
+
 module Kitchen
   module Driver
     # Digital Ocean driver for Kitchen.

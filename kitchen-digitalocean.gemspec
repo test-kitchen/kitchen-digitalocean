@@ -20,6 +20,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency 'test-kitchen', '~> 1.0'
   spec.add_dependency 'fog'
+  spec.add_dependency 'dotenv'
 
   spec.add_development_dependency 'rubocop'
   spec.add_development_dependency 'rake'
