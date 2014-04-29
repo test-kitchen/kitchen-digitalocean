@@ -1,3 +1,7 @@
+# 0.6.2 / 2014-04-28
+
+* [@juliandunn](https://github.com/juliandunn) [PR #11] Updated new image IDs from DigitalOcean.
+
 # 0.6.1 / 2014-04-12
 
 * [@juliandunn](https://github.com/juliandunn) [PR #9] DigitalOcean updated some images so the IDs required fixing.
