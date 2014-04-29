@@ -1,3 +1,7 @@
+# 0.6.3 / 2014-04-28
+
+* I messed up the release process for 0.6.2 and yanked it, this is the same as 0.6.2 was meant to be, sorry.
+
 # 0.6.2 / 2014-04-28
 
 * [@juliandunn](https://github.com/juliandunn) [PR #11] Updated new image IDs from DigitalOcean.
