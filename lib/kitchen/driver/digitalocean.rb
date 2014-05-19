@@ -60,7 +60,7 @@ module Kitchen
       end
 
       default_config :ssh_key_ids do |driver|
-        ENV['SSH_KEY_IDS']
+        ENV['DIGITALOCEAN_SSH_KEY_IDS'] || ENV['SSH_KEY_IDS']
       end
 
       required_config :digitalocean_client_id
