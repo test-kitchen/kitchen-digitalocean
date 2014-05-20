@@ -1,10 +1,11 @@
+---
 language: ruby
-
-gemfile:
-  - Gemfile
-
 rvm:
   - 1.9.3
-  - 2.0.0
+  - 2.0
+  - 2.1
+bundler_args: --jobs 7
+gemfile:
+  - Gemfile
 
 # vim: ai et ts=2 sts=2 sw=2 ft=yaml
