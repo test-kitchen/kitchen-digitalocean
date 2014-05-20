@@ -314,7 +314,7 @@ describe Kitchen::Driver::Digitalocean do
 
     it 'generates a name' do
       expect(driver.default_name).to match(
-        /^potatoes-user-host-/)
+        /^potatoes-user-(\S*)-host/)
     end
   end
 end
