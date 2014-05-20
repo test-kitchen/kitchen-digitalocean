@@ -1,3 +1,9 @@
+# 0.7.0 / 2014-05-20
+
+* [@zhann](https://github.com/Zhann) [PR #15] Makes hostnames RFC compatible
+* [@coderanger](https://github.com/coderanger) [PR #14] New image ID for centos-6.5
+* [@coderanger](https://github.com/coderanger) [PR #13] Allow using a correctly name-scoped environment variable for ssh_key_ids
+
 # 0.6.4 / 2014-05-02
 
 * Update image list.
