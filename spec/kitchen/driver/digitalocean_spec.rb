@@ -32,10 +32,10 @@ describe Kitchen::Driver::Digitalocean do
 
   let(:instance) do
     double(
-      :name => 'potatoes',
-      :logger => logger,
-      :to_str => 'instance',
-      :platform => double(:name => platform_name)
+      name: 'potatoes',
+      logger: logger,
+      to_str: 'instance',
+      platform: double(name: platform_name)
     )
   end
 
@@ -101,14 +101,14 @@ describe Kitchen::Driver::Digitalocean do
 
     context 'overridden options' do
       config = {
-        :image_id => '22',
-        :flavor_id => '63',
-        :ssh_key_ids => '5678',
-        :username => 'admin',
-        :port => '2222',
-        :server_name => 'puppy',
-        :region_id => '1',
-        :flavor => '1GB'
+        image_id: '22',
+        flavor_id: '63',
+        ssh_key_ids: '5678',
+        username: 'admin',
+        port: '2222',
+        server_name: 'puppy',
+        region_id: '1',
+        flavor: '1GB'
       }
 
       let(:config) { config }
@@ -123,8 +123,8 @@ describe Kitchen::Driver::Digitalocean do
 
   describe '#create' do
     let(:server) do
-      double(:id => 'test123', :wait_for => true,
-        :public_ip_address => '1.2.3.4')
+      double(id: 'test123', wait_for: true,
+             public_ip_address: '1.2.3.4')
     end
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
@@ -138,8 +138,8 @@ describe Kitchen::Driver::Digitalocean do
     context 'username and API key only provided' do
       let(:config) do
         {
-          :digitalocean_client_id => 'hello',
-          :digitalocean_api_key => 'world'
+          digitalocean_client_id: 'hello',
+          digitalocean_api_key: 'world'
         }
       end
 
@@ -163,10 +163,10 @@ describe Kitchen::Driver::Digitalocean do
   describe '#destroy' do
     let(:server_id) { '12345' }
     let(:hostname) { 'example.com' }
-    let(:state) { { :server_id => server_id, :hostname => hostname } }
+    let(:state) { { server_id: server_id, hostname: hostname } }
     let(:server) { double(:nil? => false, :destroy => true) }
-    let(:servers) { double(:get => server) }
-    let(:compute) { double(:servers => servers) }
+    let(:servers) { double(get: server) }
+    let(:compute) { double(servers: servers) }
 
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
@@ -200,7 +200,7 @@ describe Kitchen::Driver::Digitalocean do
         s.stub(:get).with('12345').and_return(nil)
         s
       end
-      let(:compute) { double(:servers => servers) }
+      let(:compute) { double(servers: servers) }
       let(:driver) do
         d = Kitchen::Driver::Digitalocean.new(config)
         d.instance = instance
@@ -218,8 +218,8 @@ describe Kitchen::Driver::Digitalocean do
   describe '#compute' do
     let(:config) do
       {
-        :digitalocean_client_id => 'monkey',
-        :digitalocean_api_key => 'potato',
+        digitalocean_client_id: 'monkey',
+        digitalocean_api_key: 'potato',
       }
     end
 
@@ -232,7 +232,7 @@ describe Kitchen::Driver::Digitalocean do
 
     context 'no username provided' do
       let(:config) do
-        { :digitalocean_client_id => nil, :digitalocean_api_key => '1234' }
+        { digitalocean_client_id: nil, digitalocean_api_key: '1234' }
       end
 
       it 'raises an error' do
@@ -242,7 +242,7 @@ describe Kitchen::Driver::Digitalocean do
 
     context 'no API key provided' do
       let(:config) do
-        { :digitalocean_client_id => 'monkey', :digitalocean_api_key => nil }
+        { digitalocean_client_id: 'monkey', digitalocean_api_key: nil }
       end
 
       it 'raises an error' do
@@ -254,16 +254,16 @@ describe Kitchen::Driver::Digitalocean do
   describe '#create_server' do
     let(:config) do
       {
-        :server_name => 'hello',
-        :image_id => 'there',
-        :flavor_id => '68',
-        :region_id => '3',
-        :private_networking => true,
-        :ssh_key_ids => '1234'
+        server_name: 'hello',
+        image_id: 'there',
+        flavor_id: '68',
+        region_id: '3',
+        private_networking: true,
+        ssh_key_ids: '1234'
       }
     end
     before(:each) do
-      @expected = config.merge(:name => config[:server_name])
+      @expected = config.merge(name: config[:server_name])
       @expected.delete_if do |k, v|
         k == :server_name
       end
@@ -273,7 +273,7 @@ describe Kitchen::Driver::Digitalocean do
       s.stub(:create) { |arg| arg }
       s
     end
-    let(:compute) { double(:servers => servers) }
+    let(:compute) { double(servers: servers) }
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
       d.instance = instance
@@ -289,11 +289,11 @@ describe Kitchen::Driver::Digitalocean do
   describe 'Region and Flavor names should be converted to IDs' do
     let(:config) do
       {
-        :server_name => 'hello',
-        :image_id => 'there',
-        :flavor => '2gb',
-        :region => 'amsterdam 2',
-        :ssh_key_ids => '1234'
+        server_name: 'hello',
+        image_id: 'there',
+        flavor: '2gb',
+        region: 'amsterdam 2',
+        ssh_key_ids: '1234'
       }
     end
 
