@@ -43,7 +43,7 @@ You also have the option of providing your credentials from environment variable
 ```bash
 export DIGITALOCEAN_CLIENT_ID="1234"
 export DIGITALOCEAN_API_KEY="5678"
-export SSH_KEY_IDS="1234, 5678"
+export DIGITALOCEAN_SSH_KEY_IDS="1234, 5678"
 ```
 
 Note that your `SSH_KEY_ID` must be the numeric id of your ssh key, not the symbolic name. To get the numeric ID
