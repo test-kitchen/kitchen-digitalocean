@@ -48,7 +48,7 @@ describe Kitchen::Driver::Digitalocean do
   before(:each) do
     ENV['DIGITALOCEAN_CLIENT_ID'] = 'clientid'
     ENV['DIGITALOCEAN_API_KEY'] = 'apikey'
-    ENV['SSH_KEY_IDS'] = '1234'
+    ENV['DIGITALOCEAN_SSH_KEY_IDS'] = '1234'
   end
 
   describe '#initialize'do
@@ -129,9 +129,9 @@ describe Kitchen::Driver::Digitalocean do
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
       d.instance = instance
-      d.stub(:default_name).and_return('a_monkey!')
-      d.stub(:create_server).and_return(server)
-      d.stub(:wait_for_sshd).with('1.2.3.4').and_return(true)
+      allow(d).to receive(:default_name).and_return('a_monkey!')
+      allow(d).to receive(:create_server).and_return(server)
+      allow(d).to receive(:wait_for_sshd).with('1.2.3.4').and_return(true)
       d
     end
 
@@ -171,14 +171,14 @@ describe Kitchen::Driver::Digitalocean do
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
       d.instance = instance
-      d.stub(:compute).and_return(compute)
+      allow(d).to receive(:compute).and_return(compute)
       d
     end
 
     context 'a live server that needs to be destroyed' do
       it 'destroys the server' do
-        state.should_receive(:delete).with(:server_id)
-        state.should_receive(:delete).with(:hostname)
+        expect(state).to receive(:delete).with(:server_id)
+        expect(state).to receive(:delete).with(:hostname)
         driver.destroy(state)
       end
     end
@@ -187,9 +187,9 @@ describe Kitchen::Driver::Digitalocean do
       let(:state) { Hash.new }
 
       it 'does nothing' do
-        driver.stub(:compute)
-        driver.should_not_receive(:compute)
-        state.should_not_receive(:delete)
+        allow(driver).to receive(:compute)
+        expect(driver).not_to receive(:compute)
+        expect(state).not_to receive(:delete)
         driver.destroy(state)
       end
     end
@@ -197,14 +197,14 @@ describe Kitchen::Driver::Digitalocean do
     context 'a server that was already destroyed' do
       let(:servers) do
         s = double('servers')
-        s.stub(:get).with('12345').and_return(nil)
+        allow(s).to receive(:get).with('12345').and_return(nil)
         s
       end
       let(:compute) { double(servers: servers) }
       let(:driver) do
         d = Kitchen::Driver::Digitalocean.new(config)
         d.instance = instance
-        d.stub(:compute).and_return(compute)
+        allow(d).to receive(:compute).and_return(compute)
         d
       end
 
@@ -225,7 +225,7 @@ describe Kitchen::Driver::Digitalocean do
 
     context 'all requirements provided' do
       it 'creates a new compute connection' do
-        Fog::Compute.stub(:new) { |arg| arg }
+        allow(Fog::Compute).to receive(:new) { |arg| arg }
         expect(driver.send(:compute)).to be_a(Hash)
       end
     end
@@ -270,14 +270,14 @@ describe Kitchen::Driver::Digitalocean do
     end
     let(:servers) do
       s = double('servers')
-      s.stub(:create) { |arg| arg }
+      allow(s).to receive(:create) { |arg| arg }
       s
     end
     let(:compute) { double(servers: servers) }
     let(:driver) do
       d = Kitchen::Driver::Digitalocean.new(config)
       d.instance = instance
-      d.stub(:compute).and_return(compute)
+      allow(d).to receive(:compute).and_return(compute)
       d
     end
 
@@ -308,8 +308,8 @@ describe Kitchen::Driver::Digitalocean do
 
   describe '#default_name' do
     before(:each) do
-      Etc.stub(:getlogin).and_return('user')
-      Socket.stub(:gethostname).and_return('host')
+      allow(Etc).to receive(:getlogin).and_return('user')
+      allow(Socket).to receive(:gethostname).and_return('host')
     end
 
     it 'generates a name' do
