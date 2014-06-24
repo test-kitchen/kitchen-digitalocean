@@ -219,7 +219,7 @@ describe Kitchen::Driver::Digitalocean do
     let(:config) do
       {
         digitalocean_client_id: 'monkey',
-        digitalocean_api_key: 'potato',
+        digitalocean_api_key: 'potato'
       }
     end
 
@@ -264,7 +264,7 @@ describe Kitchen::Driver::Digitalocean do
     end
     before(:each) do
       @expected = config.merge(name: config[:server_name])
-      @expected.delete_if do |k, v|
+      @expected.delete_if do |k, _v|
         k == :server_name
       end
     end
