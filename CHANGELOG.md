@@ -1,3 +1,7 @@
+# 0.7.1 / 2014-06-23
+
+* [@RoboticCheese](https://github.com/RoboticCheese) [PR #16] Use the 64-bit CentOS 6.5 image.
+*
 # 0.7.0 / 2014-05-20
 
 * [@zhann](https://github.com/Zhann) [PR #15] Makes hostnames RFC compatible
