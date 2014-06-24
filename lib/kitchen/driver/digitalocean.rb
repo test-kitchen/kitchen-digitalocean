@@ -31,7 +31,7 @@ module Kitchen
       default_config :username, 'root'
       default_config :port, '22'
 
-      default_config :private_networking do |driver|
+      default_config :private_networking do
         true
       end
 
@@ -51,15 +51,15 @@ module Kitchen
         driver.default_name
       end
 
-      default_config :digitalocean_client_id do |driver|
+      default_config :digitalocean_client_id do
         ENV['DIGITALOCEAN_CLIENT_ID']
       end
 
-      default_config :digitalocean_api_key do |driver|
+      default_config :digitalocean_api_key do
         ENV['DIGITALOCEAN_API_KEY']
       end
 
-      default_config :ssh_key_ids do |driver|
+      default_config :ssh_key_ids do
         ENV['DIGITALOCEAN_SSH_KEY_IDS'] || ENV['SSH_KEY_IDS']
       end
 
