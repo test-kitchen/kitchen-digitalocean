@@ -30,20 +30,20 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
 SimpleCov.minimum_coverage 90
 SimpleCov.start
 
-WebMock.disable_net_connect!(:allow_localhost => true)
+WebMock.disable_net_connect!(allow_localhost: true)
 
 require_relative '../lib/kitchen/driver/digitalocean'
 
 def regions_output
-  File.read(File.join(File.dirname(__FILE__), 'mocks', 'regions.txt' ))
+  File.read(File.join(File.dirname(__FILE__), 'mocks', 'regions.txt'))
 end
 
 def flavors_output
-  File.read(File.join(File.dirname(__FILE__), 'mocks', 'flavors.txt' ))
+  File.read(File.join(File.dirname(__FILE__), 'mocks', 'flavors.txt'))
 end
 
 def images_output
-  File.read(File.join(File.dirname(__FILE__), 'mocks', 'images.txt' ))
+  File.read(File.join(File.dirname(__FILE__), 'mocks', 'images.txt'))
 end
 
 # vim: ai et ts=2 sts=2 sw=2 ft=ruby

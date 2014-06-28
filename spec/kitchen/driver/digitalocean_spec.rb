@@ -54,7 +54,10 @@ describe Kitchen::Driver::Digitalocean do
   describe '#initialize'do
     context 'default options' do
       it 'defaults to the smallest flavor size' do
-        stub_request(:get, "https://api.digitalocean.com/sizes?api_key=apikey&client_id=clientid").to_return(flavors_output)
+        stub_request(:get,
+                     'https://api.digitalocean.com/sizes' \
+                     '?api_key=apikey&client_id=clientid')
+          .to_return(flavors_output)
         expect(driver[:flavor_id]).to be_a(Integer)
       end
 
@@ -68,7 +71,9 @@ describe Kitchen::Driver::Digitalocean do
       end
 
       it 'defaults to region id 1' do
-       stub_request(:get, "https://api.digitalocean.com/regions?api_key=apikey&client_id=clientid").to_return(regions_output)
+        stub_request(:get, 'https://api.digitalocean.com/regions' \
+                           '?api_key=apikey&client_id=clientid')
+          .to_return(regions_output)
         expect(driver[:region_id]).to eq(4)
       end
 
@@ -89,8 +94,10 @@ describe Kitchen::Driver::Digitalocean do
       let(:platform_name) { 'ubuntu-12.04' }
 
       it 'defaults to the correct image ID' do
-        stub_request(:get, "https://api.digitalocean.com/images?api_key=apikey&client_id=clientid").to_return(images_output)
-        expect(driver[:image_id]).to eq(3100616)
+        stub_request(:get, 'https://api.digitalocean.com/images' \
+                           '?api_key=apikey&client_id=clientid')
+          .to_return(images_output)
+        expect(driver[:image_id]).to eq(3_100_616)
       end
     end
 
@@ -98,8 +105,10 @@ describe Kitchen::Driver::Digitalocean do
       let(:platform_name) { 'centos-6.4' }
 
       it 'defaults to the correct image ID' do
-        stub_request(:get, "https://api.digitalocean.com/images?api_key=apikey&client_id=clientid").to_return(images_output)
-        expect(driver[:image_id]).to eq(376568)
+        stub_request(:get, 'https://api.digitalocean.com/images' \
+                           '?api_key=apikey&client_id=clientid')
+          .to_return(images_output)
+        expect(driver[:image_id]).to eq(376_568)
       end
     end
 
@@ -302,12 +311,16 @@ describe Kitchen::Driver::Digitalocean do
     end
 
     it 'defaults to the correct flavor ID' do
-      stub_request(:get, "https://api.digitalocean.com/sizes?api_key=apikey&client_id=clientid").to_return(flavors_output)
+      stub_request(:get, 'https://api.digitalocean.com/sizes' \
+                         '?api_key=apikey&client_id=clientid')
+        .to_return(flavors_output)
       expect(driver[:flavor_id]).to eq(62)
     end
 
     it 'defaults to the correct region ID' do
-      stub_request(:get, "https://api.digitalocean.com/regions?api_key=apikey&client_id=clientid").to_return(regions_output)
+      stub_request(:get, 'https://api.digitalocean.com/regions' \
+                         '?api_key=apikey&client_id=clientid')
+        .to_return(regions_output)
       expect(driver[:region_id]).to eq(5)
     end
   end

@@ -96,20 +96,24 @@ module Kitchen
       def default_flavor
         defined_flavor = config.fetch(:flavor) { '512mb' }
         begin
-          flavor = compute.flavors.find { |i| i.name.match(/#{defined_flavor}/i) }
+          flavor = compute.flavors
+            .find { |i| i.name.match(/#{defined_flavor}/i) }
           flavor.id
-        rescue NoMethodError => ex
-          raise ActionFailed, "Could not find a match for the flavor #{defined_flavor}"
+        rescue NoMethodError
+          raise ActionFailed,
+                "Could not find a match for the flavor #{defined_flavor}"
         end
       end
 
       def default_region
         defined_region = config.fetch(:region) { 'New York 2' }
         begin
-          region = compute.regions.find { |i| i.name.match(/#{defined_region}/i) }
+          region = compute.regions
+            .find { |i| i.name.match(/#{defined_region}/i) }
           region.id
-        rescue NoMethodError => ex
-          raise ActionFailed, "Could not find a match for the region #{defined_region}"
+        rescue NoMethodError
+          raise ActionFailed,
+                "Could not find a match for the region #{defined_region}"
         end
       end
 
@@ -119,8 +123,9 @@ module Kitchen
         begin
           image = compute.images.find { |i| i.name.match(/#{defined_image}/i) }
           image.id
-        rescue NoMethodError => ex
-          raise ActionFailed, "Could not find a match for the image #{defined_image}"
+        rescue NoMethodError
+          raise ActionFailed,
+                "Could not find a match for the image #{defined_image}"
         end
       end
 
