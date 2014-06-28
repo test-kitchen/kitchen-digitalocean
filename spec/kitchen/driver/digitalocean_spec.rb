@@ -47,14 +47,15 @@ describe Kitchen::Driver::Digitalocean do
 
   before(:each) do
     ENV['DIGITALOCEAN_CLIENT_ID'] = 'clientid'
-    ENV['DIGITALOCEAN_API_KEY'] = 'apikey'
+    ENV['DIGITALOCEAN_API_KEY'] =  'apikey'
     ENV['DIGITALOCEAN_SSH_KEY_IDS'] = '1234'
   end
 
   describe '#initialize'do
     context 'default options' do
       it 'defaults to the smallest flavor size' do
-        expect(driver[:flavor_id]).to eq('66')
+        stub_request(:get, "https://api.digitalocean.com/sizes?api_key=apikey&client_id=clientid").to_return(flavors_output)
+        expect(driver[:flavor_id]).to be_a(Integer)
       end
 
       it 'defaults to SSH with root user on port 22' do
@@ -67,7 +68,8 @@ describe Kitchen::Driver::Digitalocean do
       end
 
       it 'defaults to region id 1' do
-        expect(driver[:region_id]).to eq('4')
+       stub_request(:get, "https://api.digitalocean.com/regions?api_key=apikey&client_id=clientid").to_return(regions_output)
+        expect(driver[:region_id]).to eq(4)
       end
 
       it 'defaults to SSH Key Ids from $SSH_KEY_IDS' do
@@ -84,10 +86,11 @@ describe Kitchen::Driver::Digitalocean do
     end
 
     context 'name is ubuntu-12.10' do
-      let(:platform_name) { 'ubuntu-12.10' }
+      let(:platform_name) { 'ubuntu-12.04' }
 
       it 'defaults to the correct image ID' do
-        expect(driver[:image_id]).to eq('3101891')
+        stub_request(:get, "https://api.digitalocean.com/images?api_key=apikey&client_id=clientid").to_return(images_output)
+        expect(driver[:image_id]).to eq(3100616)
       end
     end
 
@@ -95,7 +98,8 @@ describe Kitchen::Driver::Digitalocean do
       let(:platform_name) { 'centos-6.4' }
 
       it 'defaults to the correct image ID' do
-        expect(driver[:image_id]).to eq('562354')
+        stub_request(:get, "https://api.digitalocean.com/images?api_key=apikey&client_id=clientid").to_return(images_output)
+        expect(driver[:image_id]).to eq(376568)
       end
     end
 
@@ -298,11 +302,13 @@ describe Kitchen::Driver::Digitalocean do
     end
 
     it 'defaults to the correct flavor ID' do
-      expect(driver[:flavor_id]).to eq('62')
+      stub_request(:get, "https://api.digitalocean.com/sizes?api_key=apikey&client_id=clientid").to_return(flavors_output)
+      expect(driver[:flavor_id]).to eq(62)
     end
 
     it 'defaults to the correct region ID' do
-      expect(driver[:region_id]).to eq('5')
+      stub_request(:get, "https://api.digitalocean.com/regions?api_key=apikey&client_id=clientid").to_return(regions_output)
+      expect(driver[:region_id]).to eq(5)
     end
   end
 

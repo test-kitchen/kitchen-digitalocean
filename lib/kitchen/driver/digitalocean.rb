@@ -66,6 +66,9 @@ module Kitchen
       required_config :digitalocean_client_id
       required_config :digitalocean_api_key
       required_config :ssh_key_ids
+      required_config :image_id
+      required_config :flavor_id
+      required_config :region_id
 
       def create(state)
         server = create_server
@@ -91,20 +94,34 @@ module Kitchen
       end
 
       def default_flavor
-        flavor = config[:flavor] ? config[:flavor].upcase : nil
-        data['flavors'].fetch(flavor) { '66' }
+        defined_flavor = config.fetch(:flavor) { '512mb' }
+        begin
+          flavor = compute.flavors.find { |i| i.name.match(/#{defined_flavor}/i) }
+          flavor.id
+        rescue NoMethodError => ex
+          raise ActionFailed, "Could not find a match for the flavor #{defined_flavor}"
+        end
       end
 
       def default_region
-        regions = {}
-        data['regions'].each_pair do |key, value|
-          regions[key.upcase] = value
+        defined_region = config.fetch(:region) { 'New York 2' }
+        begin
+          region = compute.regions.find { |i| i.name.match(/#{defined_region}/i) }
+          region.id
+        rescue NoMethodError => ex
+          raise ActionFailed, "Could not find a match for the region #{defined_region}"
         end
-        regions.fetch(config[:region] ? config[:region].upcase : nil) { '4' }
       end
 
       def default_image
-        data['images'].fetch(instance.platform.name) { '473123' }
+        name = instance.platform.name.to_s.gsub(/(-|_)/, ' ')
+        defined_image = config.fetch(:image) { name }
+        begin
+          image = compute.images.find { |i| i.name.match(/#{defined_image}/i) }
+          image.id
+        rescue NoMethodError => ex
+          raise ActionFailed, "Could not find a match for the image #{defined_image}"
+        end
       end
 
       def default_name
@@ -143,16 +160,6 @@ module Kitchen
         )
       end
 
-      def data
-        @data ||= begin
-          json_file = File.expand_path(
-            File.join(%w(.. .. .. .. data digitalocean.json)),
-            __FILE__
-          )
-          JSON.load(IO.read(json_file))
-        end
-      end
-
       def debug_server_config
         debug("digitalocean:name #{config[:server_name]}")
         debug("digitalocean:image_id #{config[:image_id]}")
@@ -169,5 +176,3 @@ module Kitchen
     end
   end
 end
-
-# vim: ai et ts=2 sts=2 sw=2 ft=ruby

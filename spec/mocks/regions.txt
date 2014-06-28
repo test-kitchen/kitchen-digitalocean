@@ -1,0 +1,15 @@
+HTTP/1.1 200 OK
+Server: cloudflare-nginx
+Date: Sat, 28 Jun 2014 19:32:21 GMT
+Content-Type: application/json; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Set-Cookie: __cfduid=d75fbfc93a5a82433f1a816116e04dded1403983940940; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.digitalocean.com; HttpOnly
+Status: 200 OK
+Cache-Control: max-age=0, private, must-revalidate
+X-Request-Id: fd723713a6da439e8ed917f117767700
+X-Runtime: 0.161403
+X-Rack-Cache: miss
+CF-RAY: 141c4f4eef3f0ec1-EWR
+
+{"status":"OK","regions":[{"id":1,"name":"New York 1","slug":"nyc1"},{"id":2,"name":"Amsterdam 1","slug":"ams1"},{"id":3,"name":"San Francisco 1","slug":"sfo1"},{"id":4,"name":"New York 2","slug":"nyc2"},{"id":5,"name":"Amsterdam 2","slug":"ams2"},{"id":6,"name":"Singapore 1","slug":"sgp1"}]}
