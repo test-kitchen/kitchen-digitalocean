@@ -22,7 +22,7 @@ gem install kitchen-digitalocean
 or add it to your Gemfile if you are using [Bundler](http://bundler.io/)
 
 ```ruby
-source https://rubygems.org
+source 'https://rubygems.org'
 
 gem 'test-kitchen'
 gem 'kitchen-digitalocean'
