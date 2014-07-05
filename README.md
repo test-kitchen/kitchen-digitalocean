@@ -66,13 +66,14 @@ platforms:
 - name: ubuntu-12.10
 - name: ubuntu-13.04
 - name: ubuntu-13.10
+- name: ubuntu-14.04
 - name: centos-5.8
 - name: centos-6.4
 - name: centos-6.5
 - name: debian-6.0
 - name: debian-7.0
-- name: fedora-17
 - name: fedora-19
+- name: fedora-20
 - name: archlinux-2013.05
 ```
 
