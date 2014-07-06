@@ -50,7 +50,7 @@ Note that your `SSH_KEY_ID` must be the numeric id of your ssh key, not the symb
 of your keys, use something like to following command to get them from the digital ocean API:
 
 ```bash
-wget -q -O- https://api.digitalocean.com/ssh_keys/?client_id=[YOUR_CLIENT_ID]&api_key=[YOUR_API_KEY]
+curl -X GET https://api.digitalocean.com/v2/account/keys -H "Authorization: Bearer $DIGITALOCEAN_API_KEY"
 ```
 
 Please refer to the [Getting Started Guide](http://kitchen.ci/) for any further documentation.
