@@ -72,9 +72,9 @@ module Kitchen
         state[:server_id] = server.id
 
         info("Digital Ocean instance <#{state[:server_id]}> created.")
-        server.wait_for { print '.'; ready? } ; print '(server ready)'
+        server.wait_for { print '.'; ready? }; print '(server ready)'
         state[:hostname] = server.public_ip_address
-        wait_for_sshd(state[:hostname]) ; print "(ssh ready)\n"
+        wait_for_sshd(state[:hostname]); print "(ssh ready)\n"
         debug("digitalocean:create #{state[:hostname]}")
       rescue Fog::Errors::Error, Excon::Errors::Error => ex
         raise ActionFailed, ex.message
