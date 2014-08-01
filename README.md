@@ -63,18 +63,16 @@ This driver can determine the image_id for a select number of platforms in each 
 ---
 platforms:
 - name: ubuntu-10.04
-- name: ubuntu-12.10
-- name: ubuntu-13.04
-- name: ubuntu-13.10
+- name: ubuntu-12.04
 - name: ubuntu-14.04
 - name: centos-5.8
 - name: centos-6.4
 - name: centos-6.5
+- name: centos-7.0
 - name: debian-6.0
 - name: debian-7.0
 - name: fedora-19
 - name: fedora-20
-- name: archlinux-2013.05
 ```
 
 This will effectively generate a configuration similar to:
@@ -85,9 +83,9 @@ platforms:
 - name: ubuntu-10.04
   driver_config:
     image_id: 14097
-- name: ubuntu-12.10
+- name: ubuntu-12.04
   driver_config:
-    image_id: 473123
+    image_id: 3101045
 # ...
 - name: centos-5.8
   driver_config:
