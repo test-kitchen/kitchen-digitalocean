@@ -1,3 +1,11 @@
+# 0.7.3 / 2014-08-19
+
+* Add id for New York 3
+* Update various other data id's
+* [@sample](https://github.com/sample) [PR #23] Fix Debian 7.0 id
+* [@skottler](https://github.com/skottler) [PR #22] Update the ID for precise
+* [@RoboticCheese](https://github.com/RoboticCheese) [PR #21] Update README to reflect latest platform list
+
 # 0.7.2 / 2014-07-24
 
 * [@RoboticCheese](https://github.com/RoboticCheese) [PR #20] Update to latest image IDs
