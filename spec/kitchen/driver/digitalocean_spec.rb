@@ -46,15 +46,14 @@ describe Kitchen::Driver::Digitalocean do
   end
 
   before(:each) do
-    ENV['DIGITALOCEAN_CLIENT_ID'] = 'clientid'
-    ENV['DIGITALOCEAN_API_KEY'] = 'apikey'
+    ENV['DIGITALOCEAN_ACCESS_TOKEN'] = 'access_token'
     ENV['DIGITALOCEAN_SSH_KEY_IDS'] = '1234'
   end
 
   describe '#initialize'do
     context 'default options' do
       it 'defaults to the smallest flavor size' do
-        expect(driver[:flavor_id]).to eq('66')
+        expect(driver[:size]).to eq('512mb')
       end
 
       it 'defaults to SSH with root user on port 22' do
@@ -67,47 +66,35 @@ describe Kitchen::Driver::Digitalocean do
       end
 
       it 'defaults to region id 1' do
-        expect(driver[:region_id]).to eq('4')
+        expect(driver[:region]).to eq('nyc2')
       end
 
       it 'defaults to SSH Key Ids from $SSH_KEY_IDS' do
         expect(driver[:ssh_key_ids]).to eq('1234')
       end
 
-      it 'defaults to Client ID from $DIGITALOCEAN_CLIENT_ID' do
-        expect(driver[:digitalocean_client_id]).to eq('clientid')
-      end
-
-      it 'defaults to API key from $DIGITALOCEAN_API_KEY' do
-        expect(driver[:digitalocean_api_key]).to eq('apikey')
+      it 'defaults to Access Token from $DIGITALOCEAN_ACCESS_TOKEN' do
+        expect(driver[:digitalocean_access_token]).to eq('access_token')
       end
     end
 
-    context 'name is ubuntu-12.10' do
-      let(:platform_name) { 'ubuntu-12.10' }
+    context 'name is ubuntu-14-04-x64' do
+      let(:platform_name) { 'ubuntu-14-04-x64' }
 
       it 'defaults to the correct image ID' do
-        expect(driver[:image_id]).to eq('473123')
-      end
-    end
-
-    context 'name is centos-6.4' do
-      let(:platform_name) { 'centos-6.4' }
-
-      it 'defaults to the correct image ID' do
-        expect(driver[:image_id]).to eq('562354')
+        expect(driver[:image]).to eq('ubuntu-14-04-x64')
       end
     end
 
     context 'overridden options' do
       config = {
-        image_id: '22',
-        flavor_id: '63',
+        image: 'debian-7-0-x64',
+        flavor: '1gb',
         ssh_key_ids: '5678',
         username: 'admin',
         port: '2222',
         server_name: 'puppy',
-        region_id: '1',
+        region: 'ams1',
         flavor: '1GB'
       }
 
@@ -123,7 +110,7 @@ describe Kitchen::Driver::Digitalocean do
 
   describe '#create' do
     let(:server) do
-      double(id: 'test123', wait_for: true,
+      double(id: '1234', wait_for: true,
              public_ip_address: '1.2.3.4')
     end
     let(:driver) do
@@ -138,22 +125,27 @@ describe Kitchen::Driver::Digitalocean do
     context 'username and API key only provided' do
       let(:config) do
         {
-          digitalocean_client_id: 'hello',
-          digitalocean_api_key: 'world'
+          digitalocean_access_token: 'access_token'
         }
       end
 
       it 'generates a server name in the absence of one' do
+        stub_request(:get, 'https://api.digitalocean.com/v2/droplets/1234')
+          .to_return(create)
         driver.create(state)
         expect(driver[:server_name]).to eq('a_monkey!')
       end
 
       it 'gets a proper server ID' do
+        stub_request(:get, 'https://api.digitalocean.com/v2/droplets/1234')
+          .to_return(create)
         driver.create(state)
-        expect(state[:server_id]).to eq('test123')
+        expect(state[:server_id]).to eq('1234')
       end
 
       it 'gets a proper hostname (IP)' do
+        stub_request(:get, 'https://api.digitalocean.com/v2/droplets/1234')
+          .to_return(create)
         driver.create(state)
         expect(state[:hostname]).to eq('1.2.3.4')
       end
@@ -177,6 +169,8 @@ describe Kitchen::Driver::Digitalocean do
 
     context 'a live server that needs to be destroyed' do
       it 'destroys the server' do
+        stub_request(:delete, 'https://api.digitalocean.com/v2/droplets/12345')
+          .to_return(delete)
         expect(state).to receive(:delete).with(:server_id)
         expect(state).to receive(:delete).with(:hostname)
         driver.destroy(state)
@@ -209,102 +203,48 @@ describe Kitchen::Driver::Digitalocean do
       end
 
       it 'does not try to destroy the server again' do
+        stub_request(:delete, 'https://api.digitalocean.com/v2/droplets/12345')
+          .to_return(delete)
         allow_message_expectations_on_nil
         driver.destroy(state)
       end
     end
   end
 
-  describe '#compute' do
-    let(:config) do
-      {
-        digitalocean_client_id: 'monkey',
-        digitalocean_api_key: 'potato'
-      }
-    end
+  # describe '#create_server' do
+  #   let(:config) do
+  #     {
+  #       server_name: 'test server',
+  #       image: 'debian-7-0-x64',
+  #       size: '2gb',
+  #       region: 'nyc3',
+  #       private_networking: true,
+  #       ssh_key_ids: '1234'
+  #     }
+  #   end
+  #   before(:each) do
+  #     @expected = config.merge(name: config[:server_name])
+  #     @expected.delete_if do |k, _v|
+  #       k == :server_name
+  #     end
+  #   end
+  #   let(:servers) do
+  #     s = double('servers')
+  #     allow(s).to receive(:create) { |arg| arg }
+  #     s
+  #   end
+  #   let(:create_server) { double(servers: servers) }
+  #   let(:driver) do
+  #     d = Kitchen::Driver::Digitalocean.new(config)
+  #     d.instance = instance
+  #     allow(d).to receive(:create_server).and_return(create_server)
+  #     d
+  #   end
 
-    context 'all requirements provided' do
-      it 'creates a new compute connection' do
-        allow(Fog::Compute).to receive(:new) { |arg| arg }
-        expect(driver.send(:compute)).to be_a(Hash)
-      end
-    end
-
-    context 'no username provided' do
-      let(:config) do
-        { digitalocean_client_id: nil, digitalocean_api_key: '1234' }
-      end
-
-      it 'raises an error' do
-        expect { driver.send(:compute) }.to raise_error(ArgumentError)
-      end
-    end
-
-    context 'no API key provided' do
-      let(:config) do
-        { digitalocean_client_id: 'monkey', digitalocean_api_key: nil }
-      end
-
-      it 'raises an error' do
-        expect { driver.send(:compute) }.to raise_error(ArgumentError)
-      end
-    end
-  end
-
-  describe '#create_server' do
-    let(:config) do
-      {
-        server_name: 'hello',
-        image_id: 'there',
-        flavor_id: '68',
-        region_id: '3',
-        private_networking: true,
-        ssh_key_ids: '1234'
-      }
-    end
-    before(:each) do
-      @expected = config.merge(name: config[:server_name])
-      @expected.delete_if do |k, _v|
-        k == :server_name
-      end
-    end
-    let(:servers) do
-      s = double('servers')
-      allow(s).to receive(:create) { |arg| arg }
-      s
-    end
-    let(:compute) { double(servers: servers) }
-    let(:driver) do
-      d = Kitchen::Driver::Digitalocean.new(config)
-      d.instance = instance
-      allow(d).to receive(:compute).and_return(compute)
-      d
-    end
-
-    it 'creates the server using a compute connection' do
-      expect(driver.send(:create_server)).to eq(@expected)
-    end
-  end
-
-  describe 'Region and Flavor names should be converted to IDs' do
-    let(:config) do
-      {
-        server_name: 'hello',
-        image_id: 'there',
-        flavor: '2gb',
-        region: 'amsterdam 2',
-        ssh_key_ids: '1234'
-      }
-    end
-
-    it 'defaults to the correct flavor ID' do
-      expect(driver[:flavor_id]).to eq('62')
-    end
-
-    it 'defaults to the correct region ID' do
-      expect(driver[:region_id]).to eq('5')
-    end
-  end
+  #   it 'creates the server using a compute connection' do
+  #     expect(driver.send(:create_server)).to eq(@expected)
+  #   end
+  # end
 
   describe '#default_name' do
     before(:each) do

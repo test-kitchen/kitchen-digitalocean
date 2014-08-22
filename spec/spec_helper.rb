@@ -17,11 +17,33 @@
 # limitations under the License.
 
 require 'rspec'
+require 'webmock/rspec'
+require 'simplecov'
+require 'simplecov-console'
+require 'coveralls'
+
+SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
+  Coveralls::SimpleCov::Formatter,
+  SimpleCov::Formatter::HTMLFormatter,
+  SimpleCov::Formatter::Console
+]
+SimpleCov.minimum_coverage 90
+SimpleCov.start
+
+WebMock.disable_net_connect!(allow_localhost: true)
+
 require_relative '../lib/kitchen/driver/digitalocean'
 
-RSpec.configure do |config|
-  config.tty = true
-  config.color = true
+def create
+  File.read(File.join(File.dirname(__FILE__), 'mocks', 'create.txt'))
+end
+
+def delete
+  File.read(File.join(File.dirname(__FILE__), 'mocks', 'delete.txt'))
+end
+
+def auth_error
+  File.read(File.join(File.dirname(__FILE__), 'mocks', 'auth_error.txt'))
 end
 
 # vim: ai et ts=2 sts=2 sw=2 ft=ruby

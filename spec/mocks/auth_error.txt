@@ -1,0 +1,17 @@
+HTTP/1.1 401 Unauthorized
+Server: cloudflare-nginx
+Date: Fri, 22 Aug 2014 00:23:51 GMT
+Content-Type: application/json; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Set-Cookie: __cfduid=de33405f4e3dfe14da3bc8fa075f282161408667031739; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.digitalocean.com; HttpOnly
+Status: 401 Unauthorized
+Cache-Control: no-store
+Pragma: no-cache
+WWW-Authenticate: Bearer realm="DigitalOcean", error="invalid_token", error_description="The access token is invalid"
+X-Request-Id: 1da2bd7f00ee6102f4a105592ce7c5ba
+X-Runtime: 0.008179
+X-Rack-Cache: invalidate, pass
+CF-RAY: 15daec945b0d0ed9-EWR
+
+{"id":"unauthorized","message":"Unable to authenticate you."}

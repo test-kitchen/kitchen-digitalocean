@@ -17,7 +17,7 @@
 # limitations under the License.
 
 require 'benchmark'
-require 'fog'
+require 'droplet_kit'
 require 'kitchen'
 require 'etc'
 require 'socket'
@@ -30,41 +30,22 @@ module Kitchen
     class Digitalocean < Kitchen::Driver::SSHBase
       default_config :username, 'root'
       default_config :port, '22'
+      default_config :region, 'nyc2'
+      default_config :size, '512mb'
+      default_config(:image) { |driver| driver.default_image }
+      default_config(:server_name) { |driver| driver.default_name }
+      default_config :private_networking, true
+      default_config :ipv6, false
 
-      default_config :private_networking do
-        true
-      end
-
-      default_config :region_id do |driver|
-        driver.default_region
-      end
-
-      default_config :flavor_id do |driver|
-        driver.default_flavor
-      end
-
-      default_config :image_id do |driver|
-        driver.default_image
-      end
-
-      default_config :server_name do |driver|
-        driver.default_name
-      end
-
-      default_config :digitalocean_client_id do
-        ENV['DIGITALOCEAN_CLIENT_ID']
-      end
-
-      default_config :digitalocean_api_key do
-        ENV['DIGITALOCEAN_API_KEY']
+      default_config :digitalocean_access_token do
+        ENV['DIGITALOCEAN_ACCESS_TOKEN']
       end
 
       default_config :ssh_key_ids do
         ENV['DIGITALOCEAN_SSH_KEY_IDS'] || ENV['SSH_KEY_IDS']
       end
 
-      required_config :digitalocean_client_id
-      required_config :digitalocean_api_key
+      required_config :digitalocean_access_token
       required_config :ssh_key_ids
 
       def create(state)
@@ -72,39 +53,34 @@ module Kitchen
         state[:server_id] = server.id
 
         info("Digital Ocean instance <#{state[:server_id]}> created.")
-        server.wait_for { print '.'; ready? }; print '(server ready)'
-        state[:hostname] = server.public_ip_address
+
+        while true
+          sleep 8
+          droplet = client.droplets.find(id: state[:server_id])
+
+          break if droplet \
+            && droplet.networks[:v4] \
+            && droplet.networks[:v4].any? { |n| n[:type] == 'public' }
+        end
+
+        state[:hostname] = droplet.networks[:v4]
+          .find { |n| n[:type] == 'public' }['ip_address']
+
         wait_for_sshd(state[:hostname]); print "(ssh ready)\n"
         debug("digitalocean:create #{state[:hostname]}")
-      rescue Fog::Errors::Error, Excon::Errors::Error => ex
-        raise ActionFailed, ex.message
       end
 
       def destroy(state)
         return if state[:server_id].nil?
 
-        server = compute.servers.get(state[:server_id])
-        server.destroy unless server.nil?
+        client.droplets.delete(id: state[:server_id])
         info("Digital Ocean instance <#{state[:server_id]}> destroyed.")
         state.delete(:server_id)
         state.delete(:hostname)
       end
 
-      def default_flavor
-        flavor = config[:flavor] ? config[:flavor].upcase : nil
-        data['flavors'].fetch(flavor) { '66' }
-      end
-
-      def default_region
-        regions = {}
-        data['regions'].each_pair do |key, value|
-          regions[key.upcase] = value
-        end
-        regions.fetch(config[:region] ? config[:region].upcase : nil) { '4' }
-      end
-
       def default_image
-        data['images'].fetch(instance.platform.name) { '473123' }
+        instance.platform.name
       end
 
       def default_name
@@ -118,53 +94,40 @@ module Kitchen
 
       private
 
-      def compute
-        debug_compute_config
+      def client
+        debug_client_config
 
-        server_def = {
-          provider:               'Digitalocean',
-          digitalocean_api_key:   config[:digitalocean_api_key],
-          digitalocean_client_id: config[:digitalocean_client_id]
-        }
-
-        Fog::Compute.new(server_def)
+        DropletKit::Client.new(access_token: config[:digitalocean_access_token])
       end
 
       def create_server
         debug_server_config
 
-        compute.servers.create(
-          name:               config[:server_name],
-          image_id:           config[:image_id],
-          flavor_id:          config[:flavor_id],
-          region_id:          config[:region_id],
-          ssh_key_ids:        config[:ssh_key_ids],
-          private_networking: config[:private_networking]
+        droplet = DropletKit::Droplet.new(
+          name: config[:server_name],
+          region: config[:region],
+          image: config[:image],
+          size: config[:size],
+          ssh_keys: config[:ssh_key_ids].split(' '),
+          private_networking: config[:private_networking],
+          ipv6: config[:ipv6]
         )
-      end
 
-      def data
-        @data ||= begin
-          json_file = File.expand_path(
-            File.join(%w(.. .. .. .. data digitalocean.json)),
-            __FILE__
-          )
-          JSON.load(IO.read(json_file))
-        end
+        client.droplets.create(droplet)
       end
 
       def debug_server_config
         debug("digitalocean:name #{config[:server_name]}")
-        debug("digitalocean:image_id #{config[:image_id]}")
-        debug("digitalocean:flavor_id #{config[:flavor_id]}")
-        debug("digitalocean:region_id #{config[:region_id]}")
+        debug("digitalocean:image#{config[:image]}")
+        debug("digitalocean:size #{config[:size]}")
+        debug("digitalocean:region #{config[:region]}")
         debug("digitalocean:ssh_key_ids #{config[:ssh_key_ids]}")
         debug("digitalocean:private_networking #{config[:private_networking]}")
+        debug("digitalocean:ipv6 #{config[:ipv6]}")
       end
 
-      def debug_compute_config
-        debug("digitalocean_api_key #{config[:digitalocean_api_key]}")
-        debug("digitalocean_client_id #{config[:digitalocean_client_id]}")
+      def debug_client_config
+        debug("digitalocean_api_key #{config[:digitalocean_access_token]}")
       end
     end
   end

@@ -1,0 +1,132 @@
+HTTP/1.1 200 OK
+Server: cloudflare-nginx
+Date: Thu, 21 Aug 2014 23:51:40 GMT
+Content-Type: application/json; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Set-Cookie: __cfduid=de2ed0d345ecce441bb505881fcf50d341408665100399; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.digitalocean.com; HttpOnly
+Status: 200 OK
+RateLimit-Limit: 1200
+RateLimit-Remaining: 1191
+RateLimit-Reset: 1408667389
+Cache-Control: must-revalidate, private, max-age=0
+X-Request-Id: 0018d68e007a1ddf51190a3f85746740
+X-Runtime: 0.175303
+X-Rack-Cache: miss
+CF-RAY: 15dabd6d78ac00af-EWR
+
+{
+  "droplet":{
+    "id":"1234",
+    "name":"test-1234",
+    "memory":512,
+    "vcpus":1,
+    "disk":20,
+    "region":{
+      "slug":"nyc2",
+      "name":"New York 2",
+      "sizes":[
+        "1gb",
+        "2gb",
+        "4gb",
+        "8gb",
+        "32gb",
+        "64gb",
+        "512mb",
+        "16gb",
+        "48gb"
+      ],
+      "available":true,
+      "features":[
+        "virtio",
+        "private_networking",
+        "backups"
+      ]
+    },
+    "image":{
+      "id":3445812,
+      "name":"Debian 7.0 x64",
+      "distribution":"Debian",
+      "slug":null,
+      "public":false,
+      "regions":[
+        "nyc1",
+        "ams1",
+        "sfo1",
+        "nyc2",
+        "ams2",
+        "sgp1",
+        "lon1",
+        "nyc3"
+      ],
+      "created_at":"2014-05-02T18:16:21Z",
+      "action_ids":[
+        23178598,
+        23179182,
+        23179643,
+        23179647,
+        23179652,
+        23179657,
+        23179662,
+        23187797,
+        23188844,
+        23189209,
+        23190072,
+        23190271,
+        23190972,
+        23191081,
+        23192889,
+        23192901,
+        23193176,
+        23193805,
+        23193991,
+        23194165,
+        23194334,
+        23195135,
+        23196883,
+        23199694,
+        23200447
+      ]
+    },
+    "size":{
+      "slug":"512mb",
+      "transfer":1,
+      "price_monthly":5.0,
+      "price_hourly":0.00744
+    },
+    "locked":false,
+    "status":"active",
+    "networks":{
+      "v4":[
+        {
+          "ip_address":"10.128.210.209",
+          "netmask":"255.255.0.0",
+          "gateway":"10.128.1.1",
+          "type":"private"
+        },
+        {
+          "ip_address":"1.2.3.4",
+          "netmask":"255.255.255.0",
+          "gateway":"162.243.243.1",
+          "type":"public"
+        }
+      ],
+      "v6":[]
+    },
+    "kernel":{
+      "id":952,
+      "name":"* Debian 7.0 x64 vmlinuz-3.2.0-4-amd64 (3.2.54-2)",
+      "version":"3.2.0-4-amd64"
+    },
+    "created_at":"2014-08-05T01:54:38Z",
+    "features":[
+      "private_networking",
+      "virtio"
+    ],
+    "backup_ids":[],
+    "snapshot_ids":[],
+    "action_ids":[
+      30176699
+    ]
+  }
+}

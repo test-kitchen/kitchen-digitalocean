@@ -1,3 +1,13 @@
+# 0.8.0.pre1 / 2014-08-21
+
+***Breaking Changes***
+
+From this version on the driver uses API V2, the use of image_id, flavor_id, and region_id has been replaced
+with image, size, region. You can now rely on slugs instead of uses IDs. Please refer to the readme for additional information.
+
+* Upgrade to API V2
+* Drop Fog, for [droplet_kit](https://github.com/digitaloceancloud/droplet_kit)
+
 # 0.7.3 / 2014-08-19
 
 * Add id for New York 3
