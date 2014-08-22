@@ -123,9 +123,9 @@ example:
 
 Created and maintained by [Greg Fitzgerald](https://github.com/gregf/) (<greg@gregf.org>)
 
-Special Thanks
+***Special Thanks:***
 
-[Will Farrington](@https://github.com/wfarr/kitchen-digital_ocean), His fork was a help during the creation of my api v2 driver.
+[Will Farrington](https://github.com/wfarr/kitchen-digital_ocean), His fork was a help during the creation of my api v2 driver.
 
 # License
 
