@@ -27,7 +27,6 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
   SimpleCov::Formatter::HTMLFormatter,
   SimpleCov::Formatter::Console
 ]
-SimpleCov.minimum_coverage 90
 SimpleCov.start
 
 WebMock.disable_net_connect!(allow_localhost: true)
