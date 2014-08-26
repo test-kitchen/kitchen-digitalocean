@@ -28,11 +28,12 @@ describe Kitchen::Driver::Digitalocean do
   let(:logger) { Logger.new(logged_output) }
   let(:config) { Hash.new }
   let(:state) { Hash.new }
+  let(:instance_name) { 'potatoes' }
   let(:platform_name) { 'ubuntu' }
 
   let(:instance) do
     double(
-      name: 'potatoes',
+      name: instance_name,
       logger: logger,
       to_str: 'instance',
       platform: double(name: platform_name)
@@ -247,14 +248,48 @@ describe Kitchen::Driver::Digitalocean do
   # end
 
   describe '#default_name' do
+    let(:login) { 'user' }
+    let(:hostname) { 'host' }
+
     before(:each) do
-      allow(Etc).to receive(:getlogin).and_return('user')
-      allow(Socket).to receive(:gethostname).and_return('host')
+      allow(Etc).to receive(:getlogin).and_return(login)
+      allow(Socket).to receive(:gethostname).and_return(hostname)
     end
 
     it 'generates a name' do
-      expect(driver.default_name).to match(
-        /^potatoes-user-(\S*)-host/)
+      expect(driver.default_name).to match(/^potatoes-user-host-(\S*)/)
+    end
+
+    context 'local node with a long hostname' do
+      let(:hostname) { 'ab.c' * 20 }
+
+      it 'limits the generated name to 63 characters' do
+        expect(driver.default_name.length).to be <= (63)
+      end
+    end
+
+    context 'node with a long hostname, username, and base name' do
+      let(:login) { 'abcd' * 20 }
+      let(:hostname) { 'efgh' * 20 }
+      let(:instance_name) { 'ijkl' * 20 }
+
+      it 'limits the generated name to 63 characters' do
+        expect(driver.default_name.length).to eq(63)
+      end
+    end
+
+    context 'a login and hostname with punctuation in them' do
+      let(:login) { 'some.u-se-r' }
+      let(:hostname) { 'a.host-name' }
+      let(:instance_name) { 'a.instance-name' }
+
+      it 'strips out the dots to prevent bad server names' do
+        expect(driver.default_name).to_not include('.')
+      end
+
+      it 'strips out all but the three hyphen separators' do
+        expect(driver.default_name.count('-')).to eq(3)
+      end
     end
   end
 end

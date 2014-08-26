@@ -83,13 +83,21 @@ module Kitchen
         instance.platform.name
       end
 
+      # Generate what should be a unique server name up to 63 total chars
+      # Base name:    15
+      # Username:     15
+      # Hostname:     23
+      # Random string: 7
+      # Separators:    3
+      # ================
+      # Total:        63
       def default_name
-        # Generate what should be a unique server name
-        rand_str = Array.new(8) { rand(36).to_s(36) }.join
-        "#{instance.name}-"\
-        "#{Etc.getlogin.gsub('_', '-')}-"\
-        "#{rand_str}-"\
-        "#{Socket.gethostname}"
+        [
+          instance.name.gsub(/\W/, '')[0..14],
+          Etc.getlogin.gsub(/\W/, '')[0..14],
+          Socket.gethostname.gsub(/\W/, '')[0..22],
+          Array.new(7) { rand(36).to_s(36) }.join
+        ].join('-')
       end
 
       private
