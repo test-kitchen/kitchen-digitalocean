@@ -1,3 +1,7 @@
+# 0.8.0 / 2014-8-21
+
+* [@RoboticCheese](https://github.com/RoboticCheese) [PR #25] Sanitize default names, limit to 63 chars
+
 # 0.8.0.pre1 / 2014-08-21
 
 ***Breaking Changes***
