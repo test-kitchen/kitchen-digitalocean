@@ -97,7 +97,7 @@ module Kitchen
           Etc.getlogin.gsub(/\W/, '')[0..14],
           Socket.gethostname.gsub(/\W/, '')[0..22],
           Array.new(7) { rand(36).to_s(36) }.join
-        ].join('-')
+        ].join('-').gsub(/_/, '-')
       end
 
       private
