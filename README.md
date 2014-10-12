@@ -43,7 +43,7 @@ At minimum, you'll need to tell test-kitchen to use the digitalocean driver.
 ```ruby
 ---
 driver:
-  - name: digitalocean
+  name: digitalocean
 platforms:
   - name: ubuntu-12-10-x64
 ```
