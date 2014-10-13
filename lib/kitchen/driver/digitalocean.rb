@@ -54,7 +54,7 @@ module Kitchen
 
         info("Digital Ocean instance <#{state[:server_id]}> created.")
 
-        while true
+        loop do
           sleep 8
           droplet = client.droplets.find(id: state[:server_id])
 
