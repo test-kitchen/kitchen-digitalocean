@@ -1,3 +1,8 @@
+# 0.8.1 / 2014-10-13
+
+* [@sarkis](https://github.com/sarkis) [PR #32] fix driver config example
+* [@sarkis](https://github.com/sarkis) [PR #31] make sure there are no underscores in hostname
+
 # 0.8.0 / 2014-8-21
 
 * [@RoboticCheese](https://github.com/RoboticCheese) [PR #25] Sanitize default names, limit to 63 chars
