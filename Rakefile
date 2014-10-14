@@ -22,6 +22,6 @@ end
 desc 'Run RSpec unit tests'
 RSpec::Core::RakeTask.new(:spec)
 
-task default: [:cane, :rubocop, :loc, :spec]
+task default: [:rubocop, :loc, :spec]
 
 # vim: ai et ts=2 sts=2 sw=2 ft=ruby fdm=marker
