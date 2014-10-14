@@ -2,7 +2,7 @@
 
 * [@sarkis](https://github.com/sarkis) [PR #32] fix driver config example
 * [@sarkis](https://github.com/sarkis) [PR #31] make sure there are no underscores in hostname
-* Use Kernel#loop instead of while true when waiting for server creation.
+* [@sarkis](https://github.com/sarkis) [PR #30] properly split ssh key ids
 
 # 0.8.0 / 2014-8-21
 
