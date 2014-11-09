@@ -21,6 +21,7 @@ require 'droplet_kit'
 require 'kitchen'
 require 'etc'
 require 'socket'
+require 'json'
 
 module Kitchen
   module Driver
@@ -50,6 +51,7 @@ module Kitchen
 
       def create(state)
         server = create_server
+
         state[:server_id] = server.id
 
         info("Digital Ocean instance <#{state[:server_id]}> created.")
@@ -121,7 +123,14 @@ module Kitchen
           ipv6: config[:ipv6]
         )
 
-        client.droplets.create(droplet)
+        resp = client.droplets.create(droplet)
+
+        if resp.class != DropletKit::Droplet
+          error JSON.parse(resp)['message']
+          error "Please check your access token is set correctly."
+        else
+          resp
+        end
       end
 
       def debug_server_config
