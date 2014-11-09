@@ -1,3 +1,7 @@
+# 0.8.2 / 2014-11-09
+
+* Handle API errors more gracefully, closes issue #33.
+
 # 0.8.1 / 2014-10-13
 
 * [@sarkis](https://github.com/sarkis) [PR #32] fix driver config example
