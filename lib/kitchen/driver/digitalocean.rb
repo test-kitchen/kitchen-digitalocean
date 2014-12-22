@@ -118,7 +118,7 @@ module Kitchen
           region: config[:region],
           image: config[:image],
           size: config[:size],
-          ssh_keys: config[:ssh_key_ids].split(/, ?/),
+          ssh_keys: config[:ssh_key_ids].to_s.split(/, ?/),
           private_networking: config[:private_networking],
           ipv6: config[:ipv6]
         )
