@@ -1,3 +1,7 @@
+# 0.8.3 / 2014-12-29
+
+* [@RoboticCheese](https://github.com/RoboticCheese) [PR #34] make key IDs always a String
+
 # 0.8.2 / 2014-11-09
 
 * Handle API errors more gracefully, closes issue #33.
