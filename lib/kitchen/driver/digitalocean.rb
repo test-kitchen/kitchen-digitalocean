@@ -37,6 +37,7 @@ module Kitchen
       default_config(:server_name) { |driver| driver.default_name }
       default_config :private_networking, true
       default_config :ipv6, false
+      default_config :user_data, nil
 
       default_config :digitalocean_access_token do
         ENV['DIGITALOCEAN_ACCESS_TOKEN']
@@ -120,7 +121,8 @@ module Kitchen
           size: config[:size],
           ssh_keys: config[:ssh_key_ids].to_s.split(/, ?/),
           private_networking: config[:private_networking],
-          ipv6: config[:ipv6]
+          ipv6: config[:ipv6],
+          user_data: config[:user_data]
         )
 
         resp = client.droplets.create(droplet)
