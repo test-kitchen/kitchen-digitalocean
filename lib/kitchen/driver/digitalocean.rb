@@ -61,13 +61,11 @@ module Kitchen
           sleep 8
           droplet = client.droplets.find(id: state[:server_id])
 
-          break if droplet \
-            && droplet.networks[:v4] \
-            && droplet.networks[:v4].any? { |n| n[:type] == 'public' }
+          break if droplet && droplet.networks[:v4] && droplet.networks[:v4].any? { |n| n[:type] == 'public' }
         end
 
         state[:hostname] = droplet.networks[:v4]
-          .find { |n| n[:type] == 'public' }['ip_address']
+                           .find { |n| n[:type] == 'public' }['ip_address']
 
         wait_for_sshd(state[:hostname]); print "(ssh ready)\n"
         debug("digitalocean:create #{state[:hostname]}")
