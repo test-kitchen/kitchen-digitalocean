@@ -1,3 +1,7 @@
+# 0.9.0 / 2015-04-17
+
+* [@juliandunn](https://github.com/juliandunn) [PR #37] Added the ability to pass user_data into droplet creation.
+
 # 0.8.3 / 2014-12-29
 
 * [@RoboticCheese](https://github.com/RoboticCheese) [PR #34] make key IDs always a String
