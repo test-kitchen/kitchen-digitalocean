@@ -40,13 +40,11 @@ describe Kitchen::Driver::Digitalocean do
     )
   end
 
-  let(:driver) do
-    d = Kitchen::Driver::Digitalocean.new(config)
-    d.instance = instance
-    d
-  end
+  let(:driver) { described_class.new(config) }
 
   before(:each) do
+    allow_any_instance_of(described_class).to receive(:instance)
+       .and_return(instance)
     ENV['DIGITALOCEAN_ACCESS_TOKEN'] = 'access_token'
     ENV['DIGITALOCEAN_SSH_KEY_IDS'] = '1234'
   end
@@ -95,8 +93,7 @@ describe Kitchen::Driver::Digitalocean do
         username: 'admin',
         port: '2222',
         server_name: 'puppy',
-        region: 'ams1',
-        flavor: '1GB'
+        region: 'ams1'
       }
 
       let(:config) { config }
@@ -114,13 +111,17 @@ describe Kitchen::Driver::Digitalocean do
       double(id: '1234', wait_for: true,
              public_ip_address: '1.2.3.4')
     end
-    let(:driver) do
-      d = Kitchen::Driver::Digitalocean.new(config)
-      d.instance = instance
-      allow(d).to receive(:default_name).and_return('a_monkey!')
-      allow(d).to receive(:create_server).and_return(server)
-      allow(d).to receive(:wait_for_sshd).with('1.2.3.4').and_return(true)
-      d
+
+    let(:driver) { described_class.new(config) }
+
+    before(:each) do
+      {
+        default_name: 'a_monkey!',
+        create_server: server,
+        wait_for_sshd: '1.2.3.4'
+      }.each do |k, v|
+        allow_any_instance_of(described_class).to receive(k).and_return(v)
+      end
     end
 
     context 'username and API key only provided' do
@@ -161,11 +162,14 @@ describe Kitchen::Driver::Digitalocean do
     let(:servers) { double(get: server) }
     let(:compute) { double(servers: servers) }
 
-    let(:driver) do
-      d = Kitchen::Driver::Digitalocean.new(config)
-      d.instance = instance
-      allow(d).to receive(:compute).and_return(compute)
-      d
+    let(:driver) { described_class.new(config) }
+
+    before(:each) do
+      {
+        compute: compute
+      }.each do |k, v|
+        allow_any_instance_of(described_class).to receive(k).and_return(v)
+      end
     end
 
     context 'a live server that needs to be destroyed' do
@@ -196,11 +200,15 @@ describe Kitchen::Driver::Digitalocean do
         s
       end
       let(:compute) { double(servers: servers) }
-      let(:driver) do
-        d = Kitchen::Driver::Digitalocean.new(config)
-        d.instance = instance
-        allow(d).to receive(:compute).and_return(compute)
-        d
+
+      let(:driver) { described_class.new(config) }
+
+      before(:each) do
+        {
+          compute: compute
+        }.each do |k, v|
+          allow_any_instance_of(described_class).to receive(k).and_return(v)
+        end
       end
 
       it 'does not try to destroy the server again' do
