@@ -57,7 +57,7 @@ module Kitchen
 
         info("Digital Ocean instance <#{state[:server_id]}> created.")
 
-        while true
+        loop do
           sleep 8
           droplet = client.droplets.find(id: state[:server_id])
 
@@ -127,7 +127,7 @@ module Kitchen
 
         if resp.class != DropletKit::Droplet
           error JSON.parse(resp)['message']
-          error "Please check your access token is set correctly."
+          error 'Please check your access token is set correctly.'
         else
           resp
         end
