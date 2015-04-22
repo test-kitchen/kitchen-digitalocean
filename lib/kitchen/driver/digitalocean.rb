@@ -57,12 +57,13 @@ module Kitchen
 
         info("Digital Ocean instance <#{state[:server_id]}> created.")
 
-        while true
+        loop do
           sleep 8
           droplet = client.droplets.find(id: state[:server_id])
 
           break if droplet && droplet.networks[:v4] && droplet.networks[:v4].any? { |n| n[:type] == 'public' }
         end
+        droplet ||= client.droplets.find(id: state[:server_id])
 
         state[:hostname] = droplet.networks[:v4]
                            .find { |n| n[:type] == 'public' }['ip_address']
@@ -127,7 +128,7 @@ module Kitchen
 
         if resp.class != DropletKit::Droplet
           error JSON.parse(resp)['message']
-          error "Please check your access token is set correctly."
+          error 'Please check your access token is set correctly.'
         else
           resp
         end

@@ -44,7 +44,7 @@ describe Kitchen::Driver::Digitalocean do
 
   before(:each) do
     allow_any_instance_of(described_class).to receive(:instance)
-       .and_return(instance)
+      .and_return(instance)
     ENV['DIGITALOCEAN_ACCESS_TOKEN'] = 'access_token'
     ENV['DIGITALOCEAN_SSH_KEY_IDS'] = '1234'
   end
@@ -158,7 +158,7 @@ describe Kitchen::Driver::Digitalocean do
     let(:server_id) { '12345' }
     let(:hostname) { 'example.com' }
     let(:state) { { server_id: server_id, hostname: hostname } }
-    let(:server) { double(:nil? => false, :destroy => true) }
+    let(:server) { double(nil?: false, destroy: true) }
     let(:servers) { double(get: server) }
     let(:compute) { double(servers: servers) }
 
