@@ -63,6 +63,7 @@ module Kitchen
 
           break if droplet && droplet.networks[:v4] && droplet.networks[:v4].any? { |n| n[:type] == 'public' }
         end
+        droplet ||= client.droplets.find(id: state[:server_id])
 
         state[:hostname] = droplet.networks[:v4]
                            .find { |n| n[:type] == 'public' }['ip_address']
