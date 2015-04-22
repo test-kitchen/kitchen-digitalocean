@@ -44,14 +44,14 @@ describe Kitchen::Driver::Digitalocean do
 
   before(:each) do
     allow_any_instance_of(described_class).to receive(:instance)
-      .and_return(instance)
+       .and_return(instance)
     ENV['DIGITALOCEAN_ACCESS_TOKEN'] = 'access_token'
     ENV['DIGITALOCEAN_SSH_KEY_IDS'] = '1234'
   end
 
   describe '#initialize'do
     context 'default options' do
-      it 'defaults to the smallest flavor size' do
+      it 'defaults to the smallest size' do
         expect(driver[:size]).to eq('512mb')
       end
 
@@ -88,7 +88,7 @@ describe Kitchen::Driver::Digitalocean do
     context 'overridden options' do
       config = {
         image: 'debian-7-0-x64',
-        flavor: '1gb',
+        size: '1gb',
         ssh_key_ids: '5678',
         username: 'admin',
         port: '2222',
@@ -158,7 +158,7 @@ describe Kitchen::Driver::Digitalocean do
     let(:server_id) { '12345' }
     let(:hostname) { 'example.com' }
     let(:state) { { server_id: server_id, hostname: hostname } }
-    let(:server) { double(nil?: false, destroy: true) }
+    let(:server) { double(:nil? => false, :destroy => true) }
     let(:servers) { double(get: server) }
     let(:compute) { double(servers: servers) }
 
@@ -220,40 +220,37 @@ describe Kitchen::Driver::Digitalocean do
     end
   end
 
-  # describe '#create_server' do
-  #   let(:config) do
-  #     {
-  #       server_name: 'test server',
-  #       image: 'debian-7-0-x64',
-  #       size: '2gb',
-  #       region: 'nyc3',
-  #       private_networking: true,
-  #       ssh_key_ids: '1234'
-  #     }
-  #   end
-  #   before(:each) do
-  #     @expected = config.merge(name: config[:server_name])
-  #     @expected.delete_if do |k, _v|
-  #       k == :server_name
-  #     end
-  #   end
-  #   let(:servers) do
-  #     s = double('servers')
-  #     allow(s).to receive(:create) { |arg| arg }
-  #     s
-  #   end
-  #   let(:create_server) { double(servers: servers) }
-  #   let(:driver) do
-  #     d = Kitchen::Driver::Digitalocean.new(config)
-  #     d.instance = instance
-  #     allow(d).to receive(:create_server).and_return(create_server)
-  #     d
-  #   end
+  describe '#create_server' do
+    let(:config) do
+      {
+        server_name: 'hello',
+        image: 'debian-7-0-x64',
+        size: '1gb',
+        region: 'nyc3'
+      }
+    end
+    before(:each) do
+      @expected = config.merge(name: config[:server_name])
+      @expected.delete_if do |k, _|
+        k == :server_name
+      end
+    end
+    let(:droplets) do
+      s = double('droplets')
+      allow(s).to receive(:create) { |arg| arg }
+      s
+    end
+    let(:client) { double(droplets: droplets) }
 
-  #   it 'creates the server using a compute connection' do
-  #     expect(driver.send(:create_server)).to eq(@expected)
-  #   end
-  # end
+    before(:each) do
+      allow_any_instance_of(described_class).to receive(:client)
+        .and_return(client)
+    end
+
+    it 'creates the server using a compute connection' do
+      expect(driver.send(:create_server).to_h).to include(@expected)
+    end
+  end
 
   describe '#default_name' do
     let(:login) { 'user' }
