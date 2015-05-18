@@ -75,7 +75,21 @@ module Kitchen
       def destroy(state)
         return if state[:server_id].nil?
 
-        client.droplets.delete(id: state[:server_id])
+        # A new droplet cannot be destroyed before it is active
+        # Retry destroying the droplet as long as its status is "new"
+        loop do
+          droplet = client.droplets.find(id: state[:server_id])
+
+          break if !droplet
+          if droplet.status != 'new'
+            client.droplets.delete(id: state[:server_id])
+            break
+          end
+
+          info("Waiting on Digital Ocean instance <#{state[:server_id]}> to be active to destroy it, retrying in 8 seconds")
+          sleep 8
+        end
+
         info("Digital Ocean instance <#{state[:server_id]}> destroyed.")
         state.delete(:server_id)
         state.delete(:hostname)

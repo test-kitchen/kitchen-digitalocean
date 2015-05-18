@@ -174,6 +174,8 @@ describe Kitchen::Driver::Digitalocean do
 
     context 'a live server that needs to be destroyed' do
       it 'destroys the server' do
+        stub_request(:get, "https://api.digitalocean.com/v2/droplets/12345")
+          .to_return(find)
         stub_request(:delete, 'https://api.digitalocean.com/v2/droplets/12345')
           .to_return(delete)
         expect(state).to receive(:delete).with(:server_id)
@@ -212,6 +214,8 @@ describe Kitchen::Driver::Digitalocean do
       end
 
       it 'does not try to destroy the server again' do
+        stub_request(:get, "https://api.digitalocean.com/v2/droplets/12345")
+          .to_return(find)
         stub_request(:delete, 'https://api.digitalocean.com/v2/droplets/12345')
           .to_return(delete)
         allow_message_expectations_on_nil
