@@ -1,0 +1,81 @@
+HTTP/1.1 200 OK
+Server: cloudflare-nginx
+Date: Thu, 21 Aug 2014 23:51:40 GMT
+Content-Type: application/json; charset=utf-8
+Transfer-Encoding: chunked
+Connection: keep-alive
+Set-Cookie: __cfduid=de2ed0d345ecce441bb505881fcf50d341408665100399; expires=Mon, 23-Dec-2019 23:50:00 GMT; path=/; domain=.digitalocean.com; HttpOnly
+Status: 200 OK
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+X-Content-Type-Options: nosniff
+RateLimit-Limit: 5000
+RateLimit-Remaining: 4983
+RateLimit-Reset: 1432053600
+Cache-Control: max-age=0, private, must-revalidate
+X-Request-Id: 49ed05f3-328b-406c-99b0-e3a2ddadafa3
+X-Runtime: 0.236491
+CF-RAY: 1e90fbb7d41b0707-SJC
+
+{
+  "droplet": {
+    "id": 1234,
+    "name": "test-droplet",
+    "memory": 512,
+    "vcpus": 1,
+    "disk": 20,
+    "locked": false,
+    "status": "active",
+    "kernel": {
+      "id": 4703,
+      "name": "Ubuntu 14.04 x64 vmlinuz-3.13.0-52-generic",
+      "version": "3.13.0-52-generic"
+    },
+    "created_at": "2014-05-02T18:16:21Z",
+    "features": [
+      "virtio"
+    ],
+    "backup_ids": [],
+    "next_backup_window": null,
+    "snapshot_ids": [],
+    "image": {
+      "id": 11836690,
+      "name": "14.04 x64",
+      "distribution": "Ubuntu",
+      "slug": "ubuntu-14-04-x64",
+      "public": true,
+      "regions": ["nyc1", "ams1", "sfo1", "nyc2", "ams2", "sgp1", "lon1", "nyc3", "ams3", "fra1"],
+      "created_at": "2015-05-12T23:51:05Z",
+      "min_disk_size": 20,
+      "type": "snapshot"
+    },
+    "size": {
+      "slug": "512mb",
+      "memory": 512,
+      "vcpus": 1,
+      "disk": 20,
+      "transfer": 1.0,
+      "price_monthly": 5.0,
+      "price_hourly": 0.00744,
+      "regions": ["nyc1", "sgp1", "ams1", "sfo1", "nyc2", "lon1", "nyc3", "ams3", "ams2", "fra1"],
+      "available": true
+    },
+    "size_slug": "512mb",
+    "networks": {
+      "v4": [{
+        "ip_address": "45.55.141.244",
+        "netmask": "255.255.192.0",
+        "gateway": "45.55.128.1",
+        "type": "public"
+      }],
+      "v6": []
+    },
+    "region": {
+      "name": "New York 3",
+      "slug": "nyc3",
+      "sizes": ["32gb", "16gb", "2gb", "1gb", "4gb", "8gb", "512mb", "64gb", "48gb"],
+      "features": ["virtio", "private_networking", "backups", "ipv6", "metadata"],
+      "available": true
+    }
+  }
+}

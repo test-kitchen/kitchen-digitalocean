@@ -45,4 +45,8 @@ def auth_error
   File.read(File.join(File.dirname(__FILE__), 'mocks', 'auth_error.txt'))
 end
 
+def find
+  File.read(File.join(File.dirname(__FILE__), 'mocks', 'find.txt'))
+end
+
 # vim: ai et ts=2 sts=2 sw=2 ft=ruby
