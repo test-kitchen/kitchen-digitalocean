@@ -1,3 +1,7 @@
+# 0.9.1 / 2015-06-19
+
+* [@olivielpeau](https://github.com/olivielpeau) [PR #40] Destroy properly droplets that are still "new"
+
 # 0.9.0 / 2015-04-17
 
 * [@juliandunn](https://github.com/juliandunn) [PR #37] Added the ability to pass user_data into droplet creation.
