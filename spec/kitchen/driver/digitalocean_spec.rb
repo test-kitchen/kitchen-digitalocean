@@ -85,6 +85,14 @@ describe Kitchen::Driver::Digitalocean do
       end
     end
 
+    context 'platform name matches a known platform => slug mapping' do
+      let(:platform_name) { 'ubuntu-14.04' }
+
+      it 'defaults to the correct image ID' do
+        expect(driver[:image]).to eq('ubuntu-14-04-x64')
+      end
+    end
+
     context 'overridden options' do
       config = {
         image: 'debian-7-0-x64',
