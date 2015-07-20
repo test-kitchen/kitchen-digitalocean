@@ -1,3 +1,7 @@
+# 0.9.2 / 2015-07-20
+
+* [@joonas](https://github.com/joonas) [PR #41] Add the ability to map well-known platforms to slugs
+
 # 0.9.1 / 2015-06-19
 
 * [@olivielpeau](https://github.com/olivielpeau) [PR #40] Destroy properly droplets that are still "new"
