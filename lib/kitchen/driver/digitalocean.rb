@@ -95,8 +95,12 @@ module Kitchen
         state.delete(:hostname)
       end
 
+      # This method attempts to fetch the platform from a list of well-known
+      # platform => slug mappings, and falls back to using just the platform as
+      # provided if it can't find a mapping.
       def default_image
-        instance.platform.name
+        platform_to_slug_mapping.fetch(instance.platform.name,
+                                       instance.platform.name)
       end
 
       # Generate what should be a unique server name up to 63 total chars
@@ -160,6 +164,24 @@ module Kitchen
 
       def debug_client_config
         debug("digitalocean_api_key #{config[:digitalocean_access_token]}")
+      end
+
+      def platform_to_slug_mapping
+        {
+          'centos-5.10'  => 'centos-5-8-x64',
+          'centos-6.5'   => 'centos-6-5-x64',
+          'centos-7.0'   => 'centos-7-0-x64',
+          'debian-6.0'   => 'debian-6-0-x64',
+          'debian-7.0'   => 'debian-7-0-x64',
+          'debian-8.1'   => 'debian-8-x64',
+          'fedora-21'    => 'fedora-21-x64',
+          'fedora-22'    => 'fedora-22-x64',
+          'freebsd-10.1' => 'freebsd-10-1-x64',
+          'ubuntu-12.04' => 'ubuntu-12-04-x64',
+          'ubuntu-14.04' => 'ubuntu-14-04-x64',
+          'ubuntu-14.10' => 'ubuntu-14-10-x64',
+          'ubuntu-15.04' => 'ubuntu-15-04-x64'
+        }
       end
     end
   end
