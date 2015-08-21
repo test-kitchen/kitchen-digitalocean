@@ -160,6 +160,7 @@ module Kitchen
         debug("digitalocean:ssh_key_ids #{config[:ssh_key_ids]}")
         debug("digitalocean:private_networking #{config[:private_networking]}")
         debug("digitalocean:ipv6 #{config[:ipv6]}")
+        debug("digitalocean:user_data #{config[:user_data]}")
       end
 
       def debug_client_config
