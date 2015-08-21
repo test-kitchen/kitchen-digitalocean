@@ -1,3 +1,8 @@
+# 0.9.3 / 2015-08-21
+
+* Show user_data option in debug output.
+* Default to 'nologin' when Etc.getlogin doesn't work (windows).
+
 # 0.9.2 / 2015-07-20
 
 * [@joonas](https://github.com/joonas) [PR #41] Add the ability to map well-known platforms to slugs
