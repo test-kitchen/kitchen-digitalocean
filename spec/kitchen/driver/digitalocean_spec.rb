@@ -77,19 +77,19 @@ describe Kitchen::Driver::Digitalocean do
       end
     end
 
-    context 'name is ubuntu-14-04-3-x64' do
-      let(:platform_name) { 'ubuntu-14-04-3-x64' }
+    context 'name is ubuntu-14-04-x64' do
+      let(:platform_name) { 'ubuntu-14-04-x64' }
 
       it 'defaults to the correct image ID' do
-        expect(driver[:image]).to eq('ubuntu-14-04-3-x64')
+        expect(driver[:image]).to eq('ubuntu-14-04-x64')
       end
     end
 
     context 'platform name matches a known platform => slug mapping' do
-      let(:platform_name) { 'ubuntu-14.04.3' }
+      let(:platform_name) { 'ubuntu-14.04' }
 
       it 'matches the correct image slug' do
-        expect(driver[:image]).to eq('ubuntu-14-04-3-x64')
+        expect(driver[:image]).to eq('ubuntu-14-04-x64')
       end
     end
 

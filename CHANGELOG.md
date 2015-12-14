@@ -1,3 +1,7 @@
+# 0.9.5 / 2015-12-14
+
+* This release fixes the slugs I accidentally broke in 0.9.4.
+
 # 0.9.4 / 2015-12-14
 
 * Update slug mappings.
