@@ -1,3 +1,7 @@
+# 0.9.4 / 2015-12-14
+
+* Update slug mappings.
+
 # 0.9.3 / 2015-08-21
 
 * Show user_data option in debug output.
