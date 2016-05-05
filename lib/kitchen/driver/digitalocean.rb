@@ -186,7 +186,8 @@ module Kitchen
           'ubuntu-12.04'   => 'ubuntu-12-04-x64',
           'ubuntu-14.04'   => 'ubuntu-14-04-x64',
           'ubuntu-15.04'   => 'ubuntu-15-04-x64',
-          'ubuntu-15.10'   => 'ubuntu-15-10-x64'
+          'ubuntu-15.10'   => 'ubuntu-15-10-x64',
+          'ubuntu-16.04'   => 'ubuntu-16-04-x64',
         }
       end
     end
