@@ -1,8 +1,8 @@
-[![Gem Version](https://badge.fury.io/rb/kitchen-digitalocean.png)](http://badge.fury.io/rb/kitchen-digitalocean) 
+[![Gem Version](https://badge.fury.io/rb/kitchen-digitalocean.svg)](http://badge.fury.io/rb/kitchen-digitalocean) 
 [![Build Status](https://travis-ci.org/test-kitchen/kitchen-digitalocean.png?branch=master)](https://travis-ci.org/test-kitchen/kitchen-digitalocean) 
 [![Code Climate](https://codeclimate.com/github/test-kitchen/kitchen-digitalocean.png)](https://codeclimate.com/github/test-kitchen/kitchen-digitalocean) 
 [![Coverage Status](https://coveralls.io/repos/test-kitchen/kitchen-digitalocean/badge.svg?branch=master)](https://coveralls.io/r/test-kitchen/kitchen-digitalocean?branch=master)
-[![Dependency Status](https://gemnasium.com/test-kitchen/kitchen-digitalocean.png)](https://gemnasium.com/test-kitchen/kitchen-digitalocean)
+[![Dependency Status](https://gemnasium.com/test-kitchen/kitchen-digitalocean.svg)](https://gemnasium.com/test-kitchen/kitchen-digitalocean)
 
 # Kitchen::Digitalocean
 
