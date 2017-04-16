@@ -63,6 +63,17 @@ of your keys, use something like to following command to get them from the digit
 curl -X GET https://api.digitalocean.com/v2/account/keys -H "Authorization: Bearer $DIGITALOCEAN_ACCESS_TOKEN"
 ```
 
+If anything ssh-related causes behavior like `kitchen converge` asking you for a password then the SSH command line can be displayed using `kitchen login -l debug`. It might happen that the created DO Droplet will be created with the correct SSHKey, but kitchen won't find it. In this case you can set the path to the keyfile on your machine within the .kitchen.yml file as following:
+
+```yaml
+
+driver:
+  name: digitalocean
+  region: ams1
+  ssh_key_ids: 123456
+  ssh_key: '~/.ssh/digitalocean' # <<<
+```
+
 Please refer to the [Getting Started Guide](http://kitchen.ci/) for any further documentation.
 
 # Default Configuration
