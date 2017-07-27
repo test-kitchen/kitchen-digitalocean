@@ -1,3 +1,7 @@
+# 0.9.6 / 2017-07-27
+
+* [@martinisoft] Bump droplet_kit to latest 2.0 series release
+
 # 0.9.5 / 2015-12-14
 
 * This release fixes the slugs I accidentally broke in 0.9.4.
