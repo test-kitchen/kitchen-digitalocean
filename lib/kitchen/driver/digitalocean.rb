@@ -32,7 +32,7 @@ module Kitchen
     class Digitalocean < Kitchen::Driver::SSHBase
       default_config :username, 'root'
       default_config :port, '22'
-      default_config :region, 'nyc2'
+      default_config :region, 'nyc1'
       default_config :size, '512mb'
       default_config(:image, &:default_image)
       default_config(:server_name, &:default_name)
