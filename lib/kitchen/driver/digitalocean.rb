@@ -62,7 +62,8 @@ module Kitchen
           sleep 8
           droplet = client.droplets.find(id: state[:server_id])
 
-          break if droplet && droplet.networks[:v4] && droplet.networks[:v4].any? { |n| n[:type] == 'public' }
+          break if droplet && droplet.networks[:v4] &&
+            droplet.networks[:v4].any? { |n| n[:type] == 'public' }
         end
         droplet ||= client.droplets.find(id: state[:server_id])
 
@@ -87,7 +88,8 @@ module Kitchen
             break
           end
 
-          info("Waiting on Digital Ocean instance <#{state[:server_id]}> to be active to destroy it, retrying in 8 seconds")
+          info("Waiting on Digital Ocean instance <#{state[:server_id]}>
+               to be active to destroy it, retrying in 8 seconds")
           sleep 8
         end
 
