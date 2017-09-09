@@ -1,3 +1,15 @@
+# 0.9.8 / 2017-09-09
+
+* After the 0.9.7 release I noticed the nyc2 datacenter we were defaulting to no longer exists, now defaulting to nyc1.
+
+# 0.9.7 / 2017-09-09
+
+* Update slug abbrevations
+* Bump a few testing tools in the gemspec file
+* Fix some rubocop warnings
+* Fix tests
+
+
 # 0.9.6 / 2017-07-27
 
 * [@martinisoft] Bump droplet_kit to latest 2.0 series release
