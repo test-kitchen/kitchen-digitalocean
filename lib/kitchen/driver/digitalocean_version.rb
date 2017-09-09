@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+
 #
 # Author:: Greg Fitzgerald (<greg@gregf.org>)
 #
@@ -19,7 +20,7 @@
 module Kitchen
   module Driver
     # Version string for Digital Ocean Kitchen driver
-    DIGITALOCEAN_VERSION = '0.9.6'
+    DIGITALOCEAN_VERSION = '0.9.6'.freeze
   end
 end
 

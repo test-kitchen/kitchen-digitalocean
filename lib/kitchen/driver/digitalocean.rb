@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+
 #
 # Author:: Greg Fitzgerald (<greg@gregf.org>)
 #
@@ -33,8 +34,8 @@ module Kitchen
       default_config :port, '22'
       default_config :region, 'nyc2'
       default_config :size, '512mb'
-      default_config(:image) { |driver| driver.default_image }
-      default_config(:server_name) { |driver| driver.default_name }
+      default_config(:image, &:default_image)
+      default_config(:server_name, &:default_name)
       default_config :private_networking, true
       default_config :ipv6, false
       default_config :user_data, nil
@@ -66,7 +67,7 @@ module Kitchen
         droplet ||= client.droplets.find(id: state[:server_id])
 
         state[:hostname] = droplet.networks[:v4]
-                           .find { |n| n[:type] == 'public' }['ip_address']
+                                  .find { |n| n[:type] == 'public' }['ip_address']
 
         wait_for_sshd(state[:hostname]); print "(ssh ready)\n"
         debug("digitalocean:create #{state[:hostname]}")
@@ -80,7 +81,7 @@ module Kitchen
         loop do
           droplet = client.droplets.find(id: state[:server_id])
 
-          break if !droplet
+          break unless droplet
           if droplet.status != 'new'
             client.droplets.delete(id: state[:server_id])
             break
@@ -117,7 +118,7 @@ module Kitchen
           (Etc.getlogin || 'nologin').gsub(/\W/, '')[0..14],
           Socket.gethostname.gsub(/\W/, '')[0..22],
           Array.new(7) { rand(36).to_s(36) }.join
-        ].join('-').gsub(/_/, '-')
+        ].join('-').tr('_', '-')
       end
 
       private
@@ -187,7 +188,7 @@ module Kitchen
           'ubuntu-14.04'   => 'ubuntu-14-04-x64',
           'ubuntu-15.04'   => 'ubuntu-15-04-x64',
           'ubuntu-15.10'   => 'ubuntu-15-10-x64',
-          'ubuntu-16.04'   => 'ubuntu-16-04-x64',
+          'ubuntu-16.04'   => 'ubuntu-16-04-x64'
         }
       end
     end
