@@ -1,14 +1,13 @@
----
 language: ruby
-rvm:
-  - 2.1
-before_install:
-  - gem install bundler
-bundler_args: --jobs 7
-gemfile:
-  - Gemfile
-branches:
-  only:
-  - master
+cache: bundler
 
-# vim: ai et ts=2 sts=2 sw=2 ft=yaml
+sudo: false
+
+rvm:
+    - 2.3.3
+    - 2.4.0
+    - ruby-head
+
+matrix:
+  allow_failures:
+    - rvm: ruby-head
