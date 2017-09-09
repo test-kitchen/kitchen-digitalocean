@@ -46,7 +46,7 @@ At minimum, you'll need to tell test-kitchen to use the digitalocean driver.
 driver:
   name: digitalocean
 platforms:
-  - name: ubuntu-12-10-x64
+  - name: ubuntu-17
 ```
 
 You also have the option of providing your credentials from environment variables.
@@ -103,6 +103,46 @@ IPv6 is disabled by default, you can enable this if needed. IPv6 is only availab
 ---
 driver:
   - ipv6: true
+```
+
+# Image abbrevations we use
+
+This is a list of abbreviate image names we provide
+
+```
+centos-6
+centos-7
+coreos-stable
+oreos-beta
+coreos-alpha
+debian-7
+ebian-8
+debian-9
+fedora-24
+fedora-25
+fedora-26
+reebsd-11.1
+freebsd-11.0
+freebsd-10.3
+ubuntu-14
+ubuntu-16
+ubuntu-17
+```
+
+# Regions
+
+```
+nyc1    New York 1
+sfo1    San Francisco 1
+ams2    Amsterdam 2
+sgp1    Singapore 1
+lon1    London 1
+nyc3    New York 3
+ams3    Amsterdam 3
+fra1    Frankfurt 1
+tor1    Toronto 1
+sfo2    San Francisco 2
+blr1    Bangalore 1
 ```
 
 # Development

@@ -172,25 +172,23 @@ module Kitchen
 
       def platform_to_slug_mapping
         {
-          'centos-5.10'    => 'centos-5-8-x64',
-          'centos-6.7'     => 'centos-6-5-x64',
-          'centos-7.1'     => 'centos-7-0-x64',
-          'coreos-835.9.0' => 'coreos-stable-x64',
-          'coreos-877.1.0' => 'coreos-beta-x64',
-          'coreos-891.0.0' => 'coreos-alpha-x64',
-          'debian-6.0'     => 'debian-6-0-x64',
-          'debian-7.9'     => 'debian-7-0-x64',
-          'debian-8.2'     => 'debian-8-x64',
-          'fedora-21'      => 'fedora-21-x64',
-          'fedora-22'      => 'fedora-22-x64',
-          'fedora-23'      => 'fedora-23-x64',
-          'freebsd-10.1'   => 'freebsd-10-1-x64',
-          'freebsd-10.2'   => 'freebsd-10-2-x64',
-          'ubuntu-12.04'   => 'ubuntu-12-04-x64',
-          'ubuntu-14.04'   => 'ubuntu-14-04-x64',
-          'ubuntu-15.04'   => 'ubuntu-15-04-x64',
-          'ubuntu-15.10'   => 'ubuntu-15-10-x64',
-          'ubuntu-16.04'   => 'ubuntu-16-04-x64'
+          'centos-6'     => 'centos-6-x64',
+          'centos-7'     => 'centos-7-x64',
+          'coreos-stable' => 'coreos-stable-x64',
+          'coreos-beta' => 'coreos-beta-x64',
+          'coreos-alpha' => 'coreos-alpha-x64',
+          'debian-7'     => 'debian-7-x64',
+          'debian-8'     => 'debian-8-x64',
+          'debian-9'     => 'debian-9-x64',
+          'fedora-24'      => 'fedora-24-x64',
+          'fedora-25'      => 'fedora-25-x64',
+          'fedora-26'      => 'fedora-26-x64',
+          'freebsd-11.1'   => 'freebsd-11-1-x64-zfs',
+          'freebsd-11.0'   => 'freebsd-11-0-x64-zfs',
+          'freebsd-10.3'   => 'freebsd-10-3-x64-zfs',
+          'ubuntu-14'   => 'ubuntu-14-04-x64',
+          'ubuntu-16'   => 'ubuntu-16-04-x64',
+          'ubuntu-17'   => 'ubuntu-17-04-x64'
         }
       end
     end
