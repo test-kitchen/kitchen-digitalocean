@@ -65,7 +65,7 @@ describe Kitchen::Driver::Digitalocean do
       end
 
       it 'defaults to region id 1' do
-        expect(driver[:region]).to eq('nyc2')
+        expect(driver[:region]).to eq('nyc1')
       end
 
       it 'defaults to SSH Key Ids from $SSH_KEY_IDS' do

@@ -20,7 +20,7 @@
 module Kitchen
   module Driver
     # Version string for Digital Ocean Kitchen driver
-    DIGITALOCEAN_VERSION = '0.9.7'.freeze
+    DIGITALOCEAN_VERSION = '0.9.8'.freeze
   end
 end
 
