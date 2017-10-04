@@ -1,6 +1,6 @@
-[![Gem Version](https://badge.fury.io/rb/kitchen-digitalocean.svg)](http://badge.fury.io/rb/kitchen-digitalocean) 
-[![Build Status](https://travis-ci.org/test-kitchen/kitchen-digitalocean.png?branch=master)](https://travis-ci.org/test-kitchen/kitchen-digitalocean) 
-[![Code Climate](https://codeclimate.com/github/test-kitchen/kitchen-digitalocean.png)](https://codeclimate.com/github/test-kitchen/kitchen-digitalocean) 
+[![Gem Version](https://badge.fury.io/rb/kitchen-digitalocean.svg)](http://badge.fury.io/rb/kitchen-digitalocean)
+[![Build Status](https://travis-ci.org/test-kitchen/kitchen-digitalocean.png?branch=master)](https://travis-ci.org/test-kitchen/kitchen-digitalocean)
+[![Code Climate](https://codeclimate.com/github/test-kitchen/kitchen-digitalocean.png)](https://codeclimate.com/github/test-kitchen/kitchen-digitalocean)
 [![Coverage Status](https://coveralls.io/repos/test-kitchen/kitchen-digitalocean/badge.svg?branch=master)](https://coveralls.io/r/test-kitchen/kitchen-digitalocean?branch=master)
 [![Dependency Status](https://gemnasium.com/test-kitchen/kitchen-digitalocean.svg)](https://gemnasium.com/test-kitchen/kitchen-digitalocean)
 
@@ -15,7 +15,7 @@ awesome work on an [Rackspace driver](https://github.com/RoboticCheese/kitchen-r
 
 From this version forward the driver uses [API V2](https://developers.digitalocean.com/) only.
 Use of image_id, flavor_id, and region_id have been replaced with image, size, and region.
-You can now use slugs instead of relying on the old data.json to translate IDs. 
+You can now use slugs instead of relying on the old data.json to translate IDs.
 Please refer to the examples below, and the API documentation for more information.
 
 # Requirements
@@ -116,7 +116,7 @@ coreos-stable
 oreos-beta
 coreos-alpha
 debian-7
-ebian-8
+debian-8
 debian-9
 fedora-24
 fedora-25
