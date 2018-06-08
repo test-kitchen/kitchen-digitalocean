@@ -180,15 +180,14 @@ module Kitchen
           'debian-7'     => 'debian-7-x64',
           'debian-8'     => 'debian-8-x64',
           'debian-9'     => 'debian-9-x64',
-          'fedora-24'      => 'fedora-24-x64',
-          'fedora-25'      => 'fedora-25-x64',
-          'fedora-26'      => 'fedora-26-x64',
+          'fedora-27'      => 'fedora-27-x64',
+          'fedora-28'      => 'fedora-28-x64',
           'freebsd-11.1'   => 'freebsd-11-1-x64-zfs',
           'freebsd-11.0'   => 'freebsd-11-0-x64-zfs',
           'freebsd-10.3'   => 'freebsd-10-3-x64-zfs',
           'ubuntu-14'   => 'ubuntu-14-04-x64',
           'ubuntu-16'   => 'ubuntu-16-04-x64',
-          'ubuntu-17'   => 'ubuntu-17-04-x64'
+          'ubuntu-17'   => 'ubuntu-17-10-x64'
         }
       end
     end

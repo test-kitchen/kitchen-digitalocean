@@ -89,7 +89,7 @@ describe Kitchen::Driver::Digitalocean do
       let(:platform_name) { 'ubuntu-17' }
 
       it 'matches the correct image slug' do
-        expect(driver[:image]).to eq('ubuntu-17-04-x64')
+        expect(driver[:image]).to eq('ubuntu-17-10-x64')
       end
     end
 
