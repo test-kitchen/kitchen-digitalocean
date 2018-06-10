@@ -187,7 +187,8 @@ module Kitchen
           'freebsd-10.3'   => 'freebsd-10-3-x64-zfs',
           'ubuntu-14'   => 'ubuntu-14-04-x64',
           'ubuntu-16'   => 'ubuntu-16-04-x64',
-          'ubuntu-17'   => 'ubuntu-17-10-x64'
+          'ubuntu-17'   => 'ubuntu-17-10-x64',
+          'ubuntu-18'   => 'ubuntu-18-04-x64'
         }
       end
     end
