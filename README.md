@@ -145,6 +145,19 @@ sfo2    San Francisco 2
 blr1    Bangalore 1
 ```
 
+
+# Tags
+
+To add tags to the droplet, provide the tags attribute
+
+```ruby
+driver:
+  tags:
+    - test-kitchen
+    - this-is-a-tag
+```
+
+
 # Firewall
 
 To create the droplet with firewalls, provide a pre-existing firewall ID as a
