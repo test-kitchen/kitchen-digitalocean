@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 #
 # Author:: Greg Fitzgerald (<greg@gregf.org>)
 #
