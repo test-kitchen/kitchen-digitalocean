@@ -1,5 +1,3 @@
-# -*- encoding: utf-8 -*-
-
 #
 # Author:: Greg Fitzgerald (<greg@gregf.org>)
 #
@@ -65,7 +63,7 @@ module Kitchen
           droplet = client.droplets.find(id: state[:server_id])
 
           break if droplet && droplet.networks[:v4] &&
-            droplet.networks[:v4].any? { |n| n[:type] == 'public' }
+                   droplet.networks[:v4].any? { |n| n[:type] == 'public' }
         end
         droplet ||= client.droplets.find(id: state[:server_id])
 
