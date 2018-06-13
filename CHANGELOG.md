@@ -1,3 +1,11 @@
+# 0.10.0 / 2018-06-13
+
+* Bump droplet_kit to latest 2.3 series release
+* Rubocop fixes
+* [@tolland] [PR #59] Add tags attribute to the driver config
+* [@tolland] [PR #58] Add firewalls attribute to driver config
+* [@tolland] [PR #57] Update image slugs for ubuntu 17, 18, fedora 27, 28
+
 # 0.9.8 / 2017-09-09
 
 * After the 0.9.7 release I noticed the nyc2 datacenter we were defaulting to no longer exists, now defaulting to nyc1.
