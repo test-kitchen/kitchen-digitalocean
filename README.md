@@ -118,15 +118,15 @@ coreos-alpha
 debian-7
 debian-8
 debian-9
-fedora-24
-fedora-25
-fedora-26
+fedora-27
+fedora-28
 reebsd-11.1
 freebsd-11.0
 freebsd-10.3
 ubuntu-14
 ubuntu-16
 ubuntu-17
+ubuntu-18
 ```
 
 # Regions
@@ -144,6 +144,32 @@ tor1    Toronto 1
 sfo2    San Francisco 2
 blr1    Bangalore 1
 ```
+
+# Firewall
+
+To create the droplet with firewalls, provide a pre-existing firewall ID as a
+string or list of string
+
+```ruby
+driver:
+  firewalls:
+    - 7a489167-a3d5-4d93-9f4a-371bd02ea8a3
+    - 624c1408-f101-4b59-af64-99c7f7560f7a
+```
+or
+```ruby
+driver:
+  firewalls: 624c1408-f101-4b59-af64-99c7f7560f7a
+```
+
+Note that your `firewalls` must be the numeric ids of your firewall. To get the 
+numeric ID, use something like to following command to get them from the digital 
+ocean API:
+
+```bash
+curl -X GET https://api.digitalocean.com/v2/firewalls -H "Authorization: Bearer $DIGITALOCEAN_ACCESS_TOKEN"
+```
+
 
 # Development
 
