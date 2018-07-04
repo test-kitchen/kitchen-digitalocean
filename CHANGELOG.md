@@ -1,6 +1,7 @@
 # UNRELEASED
 
 - Add new FreeBSD 10.4/11.2 slugs
+- Make DigitalOcean a single word in logging
 
 # 0.10.0 / 2018-06-13
 

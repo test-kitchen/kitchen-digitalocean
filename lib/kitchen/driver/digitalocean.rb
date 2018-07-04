@@ -56,7 +56,7 @@ module Kitchen
 
         state[:server_id] = server.id
 
-        info("Digital Ocean instance <#{state[:server_id]}> created.")
+        info("DigitalOcean instance <#{state[:server_id]}> created.")
 
         loop do
           sleep 8
@@ -111,12 +111,12 @@ module Kitchen
             break
           end
 
-          info("Waiting on Digital Ocean instance <#{state[:server_id]}>
+          info("Waiting on DigitalOcean instance <#{state[:server_id]}>
                to be active to destroy it, retrying in 8 seconds")
           sleep 8
         end
 
-        info("Digital Ocean instance <#{state[:server_id]}> destroyed.")
+        info("DigitalOcean instance <#{state[:server_id]}> destroyed.")
         state.delete(:server_id)
         state.delete(:hostname)
       end
