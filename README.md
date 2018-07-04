@@ -5,7 +5,7 @@
 
 # Kitchen::Digitalocean
 
-A Test Kitchen Driver for Digital Ocean
+A Test Kitchen Driver for DigitalOcean
 
 Shamelessly copied from [RoboticCheese](https://github.com/RoboticCheese)'s
 awesome work on an [Rackspace driver](https://github.com/RoboticCheese/kitchen-rackspace).
@@ -25,7 +25,7 @@ There are no external system requirements for this driver. However you will need
 
 You'll need to install the gem on your development machine.
 
-```Bash
+```bash
 gem install kitchen-digitalocean
 ```
 
@@ -97,7 +97,6 @@ driver:
 
 IPv6 is disabled by default, you can enable this if needed. IPv6 is only available in limited regions.
 
-
 ```ruby
 ---
 driver:
@@ -144,7 +143,6 @@ sfo2    San Francisco 2
 blr1    Bangalore 1
 ```
 
-
 # Tags
 
 To add tags to the droplet, provide the tags attribute
@@ -155,7 +153,6 @@ driver:
     - test-kitchen
     - this-is-a-tag
 ```
-
 
 # Firewall
 
