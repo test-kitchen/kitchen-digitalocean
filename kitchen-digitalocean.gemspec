@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.description   = 'A Test Kitchen Driver for Digital Ocean'
   spec.summary       = spec.description
   spec.homepage      = 'https://github.com/test-kitchen/kitchen-digitalocean'
-  spec.license       = 'Apache 2.0'
+  spec.license       = 'Apache-2.0'
 
   spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
   spec.executables    = []
