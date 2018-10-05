@@ -1,5 +1,6 @@
-# UNRELEASED
+# 10.1 / 2018-10/05
 
+- [@tas50] [PR #64] Slim the size of the Gem and standardize the license file / string
 - Add new FreeBSD 10.4/11.2 slugs
 - Make DigitalOcean a single word in logging
 
