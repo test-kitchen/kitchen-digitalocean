@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'test-kitchen', '~> 1.17'
 
   spec.add_development_dependency 'bundler', '~> 1.0'
-  spec.add_development_dependency 'cane', '~> 2.6'
+  spec.add_development_dependency 'cane', '~> 3.0'
   spec.add_development_dependency 'countloc', '~> 0.4'
   spec.add_development_dependency 'coveralls', '~> 0.8'
   spec.add_development_dependency 'rake'
