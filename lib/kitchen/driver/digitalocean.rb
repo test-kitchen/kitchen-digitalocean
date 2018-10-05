@@ -106,6 +106,7 @@ module Kitchen
           droplet = client.droplets.find(id: state[:server_id])
 
           break unless droplet
+
           if droplet.status != 'new'
             client.droplets.delete(id: state[:server_id])
             break

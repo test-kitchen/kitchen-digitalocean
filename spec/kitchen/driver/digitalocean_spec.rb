@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 #
 # Author:: Jonathan Hartman (<j@p4nt5.com>)
 #
@@ -26,8 +25,8 @@ require 'kitchen'
 describe Kitchen::Driver::Digitalocean do
   let(:logged_output) { StringIO.new }
   let(:logger) { Logger.new(logged_output) }
-  let(:config) { Hash.new }
-  let(:state) { Hash.new }
+  let(:config) { {} }
+  let(:state) { {} }
   let(:instance_name) { 'potatoes' }
   let(:platform_name) { 'ubuntu' }
 
@@ -44,12 +43,12 @@ describe Kitchen::Driver::Digitalocean do
 
   before(:each) do
     allow_any_instance_of(described_class).to receive(:instance)
-       .and_return(instance)
+      .and_return(instance)
     ENV['DIGITALOCEAN_ACCESS_TOKEN'] = 'access_token'
     ENV['DIGITALOCEAN_SSH_KEY_IDS'] = '1234'
   end
 
-  describe '#initialize'do
+  describe '#initialize' do
     context 'default options' do
       it 'defaults to the smallest size' do
         expect(driver[:size]).to eq('512mb')
@@ -166,7 +165,7 @@ describe Kitchen::Driver::Digitalocean do
     let(:server_id) { '12345' }
     let(:hostname) { 'example.com' }
     let(:state) { { server_id: server_id, hostname: hostname } }
-    let(:server) { double(:nil? => false, :destroy => true) }
+    let(:server) { double(nil?: false, destroy: true) }
     let(:servers) { double(get: server) }
     let(:compute) { double(servers: servers) }
 
@@ -182,7 +181,7 @@ describe Kitchen::Driver::Digitalocean do
 
     context 'a live server that needs to be destroyed' do
       it 'destroys the server' do
-        stub_request(:get, "https://api.digitalocean.com/v2/droplets/12345")
+        stub_request(:get, 'https://api.digitalocean.com/v2/droplets/12345')
           .to_return(find)
         stub_request(:delete, 'https://api.digitalocean.com/v2/droplets/12345')
           .to_return(delete)
@@ -193,7 +192,7 @@ describe Kitchen::Driver::Digitalocean do
     end
 
     context 'no server ID present' do
-      let(:state) { Hash.new }
+      let(:state) { {} }
 
       it 'does nothing' do
         allow(driver).to receive(:compute)
@@ -222,7 +221,7 @@ describe Kitchen::Driver::Digitalocean do
       end
 
       it 'does not try to destroy the server again' do
-        stub_request(:get, "https://api.digitalocean.com/v2/droplets/12345")
+        stub_request(:get, 'https://api.digitalocean.com/v2/droplets/12345')
           .to_return(find)
         stub_request(:delete, 'https://api.digitalocean.com/v2/droplets/12345')
           .to_return(delete)
@@ -281,7 +280,7 @@ describe Kitchen::Driver::Digitalocean do
       let(:hostname) { 'ab.c' * 20 }
 
       it 'limits the generated name to 63 characters' do
-        expect(driver.default_name.length).to be <= (63)
+        expect(driver.default_name.length).to be <= 63
       end
     end
 

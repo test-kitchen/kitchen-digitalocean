@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 #
 # Author:: Greg Fitzgerald (<greg@gregf.org>)
 #
@@ -23,10 +22,10 @@ require 'simplecov-console'
 require 'coveralls'
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
-  Coveralls::SimpleCov::Formatter,
-  SimpleCov::Formatter::HTMLFormatter,
-  SimpleCov::Formatter::Console
-])
+                                                                 Coveralls::SimpleCov::Formatter,
+                                                                 SimpleCov::Formatter::HTMLFormatter,
+                                                                 SimpleCov::Formatter::Console
+                                                               ])
 SimpleCov.start
 
 WebMock.disable_net_connect!(allow_localhost: true)
