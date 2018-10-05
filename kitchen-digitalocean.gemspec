@@ -13,8 +13,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/test-kitchen/kitchen-digitalocean'
   spec.license       = 'Apache-2.0'
 
-  spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
-  spec.executables    = []
+  spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR).grep(/LICENSE|^CHANGELOG|^lib/)
   spec.test_files    = spec.files.grep(/^(test|spec|features)/)
   spec.require_paths = ['lib']
 
