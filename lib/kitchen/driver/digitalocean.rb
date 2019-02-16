@@ -191,6 +191,7 @@ module Kitchen
         debug("digitalocean:region #{config[:region]}")
         debug("digitalocean:ssh_key_ids #{config[:ssh_key_ids]}")
         debug("digitalocean:private_networking #{config[:private_networking]}")
+        debug("digitalocean:ipv4 #{config[:ipv4]})")
         debug("digitalocean:ipv6 #{config[:ipv6]}")
         debug("digitalocean:user_data #{config[:user_data]}")
         debug("digitalocean:tags #{config[:tags]}")
