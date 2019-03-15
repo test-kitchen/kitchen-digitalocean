@@ -12,14 +12,13 @@ Gem::Specification.new do |spec|
   spec.homepage      = 'https://github.com/test-kitchen/kitchen-digitalocean'
   spec.license       = 'Apache-2.0'
 
-  spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR).grep(/LICENSE|^CHANGELOG|^lib/)
-  spec.test_files    = spec.files.grep(/^(test|spec|features)/)
+  spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR).grep(/LICENSE|^lib/)
   spec.require_paths = ['lib']
 
   spec.add_dependency 'droplet_kit', '~> 2.8'
-  spec.add_dependency 'test-kitchen', '~> 1.17'
+  spec.add_dependency 'test-kitchen', '>= 1.17', '< 3'
 
-  spec.add_development_dependency 'bundler', '~> 2.0'
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'cane', '~> 3.0'
   spec.add_development_dependency 'countloc', '~> 0.4'
   spec.add_development_dependency 'coveralls', '~> 0.8'
