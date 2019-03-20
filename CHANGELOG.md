@@ -1,3 +1,6 @@
+# 0.10.3 / 2019-03-20
+- Loosen dependencies
+
 # 0.10.2 / 2019-02-15
 - Update gem versions
 - Expose ipv4 address in debug information
