@@ -32,6 +32,7 @@ module Kitchen
       default_config :port, '22'
       default_config :region, 'nyc1'
       default_config :size, '512mb'
+      default_config :monitoring, false
       default_config(:image, &:default_image)
       default_config(:server_name, &:default_name)
       default_config :private_networking, true
@@ -163,6 +164,7 @@ module Kitchen
           region: config[:region],
           image: config[:image],
           size: config[:size],
+          monitoring: config[:monitoring],
           ssh_keys: config[:ssh_key_ids].to_s.split(/, ?/),
           private_networking: config[:private_networking],
           ipv6: config[:ipv6],
@@ -188,6 +190,7 @@ module Kitchen
         debug("digitalocean:name #{config[:server_name]}")
         debug("digitalocean:image#{config[:image]}")
         debug("digitalocean:size #{config[:size]}")
+        debug("digitalocean:monitoring #{config[:monitoring]}")
         debug("digitalocean:region #{config[:region]}")
         debug("digitalocean:ssh_key_ids #{config[:ssh_key_ids]}")
         debug("digitalocean:private_networking #{config[:private_networking]}")

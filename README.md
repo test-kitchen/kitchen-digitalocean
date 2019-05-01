@@ -145,7 +145,7 @@ blr1    Bangalore 1
 
 # Tags
 
-To add tags to the droplet, provide the tags attribute
+To add tags to the droplet, provide the tags attribute.
 
 ```ruby
 driver:
@@ -154,10 +154,21 @@ driver:
     - this-is-a-tag
 ```
 
+# Monitoring
+
+DigitalOcean provides a monitoring agent that you can optionally install to your
+droplet.  To enable this feature, set the monitoring attribute to true.
+
+```ruby
+---
+driver:
+  - monitoring: true
+```
+
 # Firewall
 
 To create the droplet with firewalls, provide a pre-existing firewall ID as a
-string or list of string
+string or list of strings.
 
 ```ruby
 driver:
@@ -171,8 +182,8 @@ driver:
   firewalls: 624c1408-f101-4b59-af64-99c7f7560f7a
 ```
 
-Note that your `firewalls` must be the numeric ids of your firewall. To get the 
-numeric ID, use something like to following command to get them from the digital 
+Note that your `firewalls` must be the numeric ids of your firewall. To get the
+numeric ID, use something like to following command to get them from the digital
 ocean API:
 
 ```bash
