@@ -30,7 +30,6 @@ module Kitchen
     class Digitalocean < Kitchen::Driver::SSHBase
       default_config :username, 'root'
       default_config :port, '22'
-      default_config :region, 'nyc1'
       default_config :size, '512mb'
       default_config :monitoring, false
       default_config(:image, &:default_image)
@@ -40,6 +39,10 @@ module Kitchen
       default_config :user_data, nil
       default_config :tags, nil
       default_config :firewalls, nil
+
+      default_config :region do
+        ENV['DIGITALOCEAN_REGION'] || 'nyc1'
+      end
 
       default_config :digitalocean_access_token do
         ENV['DIGITALOCEAN_ACCESS_TOKEN']

@@ -48,6 +48,49 @@ platforms:
   - name: ubuntu-17
 ```
 
+By default your droplets will be built in `nyc1` but you can change the default by updating the
+environment variable.
+
+```bash
+export DIGITALOCEAN_REGION="tor1"
+```
+
+This allows futher customization by allowing overrides at the `driver` level and the `platform`
+level.
+
+```ruby
+# DIGITALOCEAN_REGION="tor1" # set as an env var
+
+# cookbook1/.kitchen.yml
+---
+driver:
+  name: digitalocean
+  region: sgp1
+platforms:
+  - name: ubuntu-16
+  - name: ubuntu-18
+    region: sfo1
+
+# cookbook2/.kitchen.yml
+---
+driver:
+  name: digitalocean
+platforms:
+  - name: ubuntu-16
+  - name: ubuntu-18
+    region: sfo1
+```
+
+The above configuration when full tested would create the following images in their respective
+regions
+
+|Image|Region|
+|---|---|
+|cookbook1-ubuntu-16|sgp1|
+|cookbook1-ubuntu-18|sfo1|
+|cookbook2-ubuntu-16|tor1|
+|cookbook2-ubuntu-18|sfo1|
+
 You also have the option of providing your credentials from environment variables.
 
 ```bash
