@@ -76,6 +76,17 @@ describe Kitchen::Driver::Digitalocean do
       end
     end
 
+    context 'DIGITALOCEAN_REGION is tor1' do
+      before(:each) do
+        allow_any_instance_of(described_class).to receive(:instance)
+          .and_return(instance)
+        ENV['DIGITALOCEAN_REGION'] = 'tor1'
+      end
+      it 'defaults to region from DIGITALOCEAN_REGION' do
+        expect(driver[:region]).to eq('tor1')
+      end
+    end
+
     context 'name is ubuntu-14-04-x64' do
       let(:platform_name) { 'ubuntu-14-04-x64' }
 
