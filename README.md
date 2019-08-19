@@ -5,7 +5,9 @@
 
 # Kitchen::Digitalocean
 
-A Test Kitchen Driver for DigitalOcean
+A Test Kitchen Driver for [DigitalOcean](https://www.digitalocean.com). 
+
+Now proudly sponsered by [DigitalOcean](https://www.digitalocean.com). 
 
 Shamelessly copied from [RoboticCheese](https://github.com/RoboticCheese)'s
 awesome work on an [Rackspace driver](https://github.com/RoboticCheese/kitchen-rackspace).
@@ -261,3 +263,4 @@ Created and maintained by [Greg Fitzgerald](https://github.com/gregf/) (<greg@gr
 # License
 
 Apache 2.0 (see [LICENSE](https://github.com/test-kitchen/kitchen-digitalocean/blob/master/LICENSE.txt))
+
