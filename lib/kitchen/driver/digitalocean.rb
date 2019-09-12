@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Author:: Greg Fitzgerald (<greg@gregf.org>)
 #

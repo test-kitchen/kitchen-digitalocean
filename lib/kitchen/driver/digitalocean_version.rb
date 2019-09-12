@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Author:: Greg Fitzgerald (<greg@gregf.org>)
 #
@@ -18,7 +20,7 @@
 module Kitchen
   module Driver
     # Version string for Digital Ocean Kitchen driver
-    DIGITALOCEAN_VERSION = '0.10.4'.freeze
+    DIGITALOCEAN_VERSION = '0.10.4'
   end
 end
 
