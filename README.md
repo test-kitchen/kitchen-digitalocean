@@ -118,11 +118,13 @@ coreos-alpha
 debian-7
 debian-8
 debian-9
+debian-10
 fedora-27
 fedora-28
-reebsd-11.1
+freebsd-11.1
 freebsd-11.0
 freebsd-10.3
+freebsd-12
 ubuntu-14
 ubuntu-16
 ubuntu-17

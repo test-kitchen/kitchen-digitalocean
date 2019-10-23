@@ -1,3 +1,6 @@
+# 0.10.5 / 2019-10-22
+- Add Debian-10 and FreeBSD-12 image aliases
+
 # 0.10.4 / 2019-06-28
 - [@bdausses] [PR #67] Added ability to apply monitoring at droplet creation.
 - [@tolland] [PR #69] adding new slugs
