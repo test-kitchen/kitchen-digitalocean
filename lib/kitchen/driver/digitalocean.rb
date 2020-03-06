@@ -214,6 +214,7 @@ module Kitchen
         {
           'centos-6' => 'centos-6-x64',
           'centos-7' => 'centos-7-x64',
+          'centos-8' => 'centos-8-x64',
           'coreos-stable' => 'coreos-stable-x64',
           'coreos-beta' => 'coreos-beta-x64',
           'coreos-alpha' => 'coreos-alpha-x64',
@@ -225,6 +226,7 @@ module Kitchen
           'fedora-28' => 'fedora-28-x64',
           'fedora-29' => 'fedora-29-x64',
           'fedora-30' => 'fedora-30-x64',
+          'fedora-31' => 'fedora-31-x64',
           'freebsd-12' => 'freebsd-12-x64-zfs',
           'freebsd-11.2' => 'freebsd-11-2-x64-zfs',
           'freebsd-11.1' => 'freebsd-11-1-x64-zfs',
