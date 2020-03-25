@@ -51,7 +51,7 @@ describe Kitchen::Driver::Digitalocean do
   describe '#initialize' do
     context 'default options' do
       it 'defaults to the smallest size' do
-        expect(driver[:size]).to eq('512mb')
+        expect(driver[:size]).to eq('1gb')
       end
 
       it 'defaults to SSH with root user on port 22' do
