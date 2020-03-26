@@ -1,3 +1,8 @@
+# 0.10.6 / 2020-03-25
+- [@zmaupin] [PR #74] Update default size to 1GB 
+- [@tolland] [PR #73] add fedora-31 and centos-8 slugs
+- [@tas50] [PR #72] Test on the latest ruby releases
+
 # 0.10.5 / 2019-10-22
 - Add Debian-10 and FreeBSD-12 image aliases
 
