@@ -19,7 +19,7 @@ CF-RAY: 15dabd6d78ac00af-EWR
   "droplet":{
     "id":"1234",
     "name":"test-1234",
-    "memory":512,
+    "memory":1024,
     "vcpus":1,
     "disk":20,
     "region":{
@@ -89,7 +89,7 @@ CF-RAY: 15dabd6d78ac00af-EWR
       ]
     },
     "size":{
-      "slug":"512mb",
+      "slug":"1gb",
       "transfer":1,
       "price_monthly":5.0,
       "price_hourly":0.00744

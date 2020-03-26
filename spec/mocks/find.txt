@@ -21,7 +21,7 @@ CF-RAY: 1e90fbb7d41b0707-SJC
   "droplet": {
     "id": 1234,
     "name": "test-droplet",
-    "memory": 512,
+    "memory": 1024,
     "vcpus": 1,
     "disk": 20,
     "locked": false,
@@ -50,8 +50,8 @@ CF-RAY: 1e90fbb7d41b0707-SJC
       "type": "snapshot"
     },
     "size": {
-      "slug": "512mb",
-      "memory": 512,
+      "slug": "1gb",
+      "memory": 1024,
       "vcpus": 1,
       "disk": 20,
       "transfer": 1.0,
@@ -60,7 +60,7 @@ CF-RAY: 1e90fbb7d41b0707-SJC
       "regions": ["nyc1", "sgp1", "ams1", "sfo1", "nyc2", "lon1", "nyc3", "ams3", "ams2", "fra1"],
       "available": true
     },
-    "size_slug": "512mb",
+    "size_slug": "1gb",
     "networks": {
       "v4": [{
         "ip_address": "45.55.141.244",
