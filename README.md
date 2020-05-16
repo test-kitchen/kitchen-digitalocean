@@ -114,23 +114,21 @@ This is a list of abbreviate image names we provide
 ```
 centos-6
 centos-7
+centos-8
 coreos-stable
 oreos-beta
 coreos-alpha
-debian-7
-debian-8
 debian-9
 debian-10
-fedora-27
-fedora-28
-freebsd-11.1
-freebsd-11.0
-freebsd-10.3
+fedora-30
+fedora-31
+fedora-32
+freebsd-11
 freebsd-12
-ubuntu-14
 ubuntu-16
 ubuntu-17
 ubuntu-18
+ubuntu-20
 ```
 
 # Regions

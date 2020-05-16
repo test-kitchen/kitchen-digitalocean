@@ -96,10 +96,25 @@ describe Kitchen::Driver::Digitalocean do
     end
 
     context 'platform name matches a known platform => slug mapping' do
-      let(:platform_name) { 'ubuntu-17' }
+      context 'name is centos-6' do
+        let(:platform_name) { 'centos-6' }
+        it 'matches the correct image slug' do
+          expect(driver[:image]).to eq('centos-6-x64')
+        end
+      end
 
-      it 'matches the correct image slug' do
-        expect(driver[:image]).to eq('ubuntu-17-10-x64')
+      context 'name is ubuntu-19' do
+        let(:platform_name) { 'ubuntu-19' }
+        it 'matches the correct image slug' do
+          expect(driver[:image]).to eq('ubuntu-19-10-x64')
+        end
+      end
+
+      context 'name is ubuntu-20' do
+        let(:platform_name) { 'ubuntu-20' }
+        it 'matches the correct image slug' do
+          expect(driver[:image]).to eq('ubuntu-20-04-x64')
+        end
       end
     end
 

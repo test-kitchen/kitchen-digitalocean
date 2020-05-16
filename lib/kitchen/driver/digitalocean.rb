@@ -57,6 +57,26 @@ module Kitchen
       required_config :digitalocean_access_token
       required_config :ssh_key_ids
 
+      PLATFORM_SLUG_MAP = {
+        'centos-6' => 'centos-6-x64',
+        'centos-7' => 'centos-7-x64',
+        'centos-8' => 'centos-8-x64',
+        'coreos-stable' => 'coreos-stable',
+        'coreos-beta' => 'coreos-beta',
+        'coreos-alpha' => 'coreos-alpha',
+        'debian-9' => 'debian-9-x64',
+        'debian-10' => 'debian-10-x64',
+        'fedora-30' => 'fedora-30-x64',
+        'fedora-31' => 'fedora-31-x64',
+        'fedora-32' => 'fedora-32-x64',
+        'freebsd-11' => 'freebsd-11-x64-zfs',
+        'freebsd-12' => 'freebsd-12-x64-zfs',
+        'ubuntu-16' => 'ubuntu-16-04-x64',
+        'ubuntu-18' => 'ubuntu-18-04-x64',
+        'ubuntu-19' => 'ubuntu-19-10-x64',
+        'ubuntu-20' => 'ubuntu-20-04-x64'
+      }.freeze
+
       def create(state)
         server = create_server
 
@@ -132,8 +152,8 @@ module Kitchen
       # platform => slug mappings, and falls back to using just the platform as
       # provided if it can't find a mapping.
       def default_image
-        platform_to_slug_mapping.fetch(instance.platform.name,
-                                       instance.platform.name)
+        PLATFORM_SLUG_MAP.fetch(instance.platform.name,
+                                instance.platform.name)
       end
 
       # Generate what should be a unique server name up to 63 total chars
@@ -208,37 +228,6 @@ module Kitchen
 
       def debug_client_config
         debug("digitalocean_api_key #{config[:digitalocean_access_token]}")
-      end
-
-      def platform_to_slug_mapping
-        {
-          'centos-6' => 'centos-6-x64',
-          'centos-7' => 'centos-7-x64',
-          'centos-8' => 'centos-8-x64',
-          'coreos-stable' => 'coreos-stable-x64',
-          'coreos-beta' => 'coreos-beta-x64',
-          'coreos-alpha' => 'coreos-alpha-x64',
-          'debian-7' => 'debian-7-x64',
-          'debian-8' => 'debian-8-x64',
-          'debian-9' => 'debian-9-x64',
-          'debian-10' => 'debian-10-x64',
-          'fedora-27' => 'fedora-27-x64',
-          'fedora-28' => 'fedora-28-x64',
-          'fedora-29' => 'fedora-29-x64',
-          'fedora-30' => 'fedora-30-x64',
-          'fedora-31' => 'fedora-31-x64',
-          'freebsd-12' => 'freebsd-12-x64-zfs',
-          'freebsd-11.2' => 'freebsd-11-2-x64-zfs',
-          'freebsd-11.1' => 'freebsd-11-1-x64-zfs',
-          'freebsd-11.0' => 'freebsd-11-0-x64-zfs',
-          'freebsd-10.3' => 'freebsd-10-3-x64-zfs',
-          'freebsd-10.4' => 'freebsd-10-4-x64-zfs',
-          'ubuntu-14' => 'ubuntu-14-04-x64',
-          'ubuntu-16' => 'ubuntu-16-04-x64',
-          'ubuntu-17' => 'ubuntu-17-10-x64',
-          'ubuntu-18' => 'ubuntu-18-04-x64',
-          'ubuntu-19' => 'ubuntu-19-04-x64'
-        }
       end
     end
   end
