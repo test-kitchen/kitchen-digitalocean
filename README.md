@@ -249,7 +249,7 @@ driver:
     - 3a92ae2d-f1b7-4589-81b8-8ef144374453
 ```
 
-Note that your 'vpc_uuid' must be the numeric ids of your vpc. To get the
+Note that your `vpc_uuid` must be the numeric ids of your vpc. To get the
 numeric ID, use something like the following command to get them from the digital
 ocean API:
 
