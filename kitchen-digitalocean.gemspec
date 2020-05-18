@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR).grep(/LICENSE|^lib/)
   spec.require_paths = ['lib']
 
-  spec.add_dependency 'droplet_kit', '>= 2.8', '< 4.0'
+  spec.add_dependency 'droplet_kit', '>= 3.7', '< 4.0'
   spec.add_dependency 'test-kitchen', '>= 1.17', '< 3'
 
   spec.add_development_dependency 'bundler'

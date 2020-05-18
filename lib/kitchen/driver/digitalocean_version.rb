@@ -20,7 +20,7 @@
 module Kitchen
   module Driver
     # Version string for Digital Ocean Kitchen driver
-    DIGITALOCEAN_VERSION = '0.10.7'
+    DIGITALOCEAN_VERSION = '0.11.0'
   end
 end
 

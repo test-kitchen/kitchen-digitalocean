@@ -238,6 +238,25 @@ ocean API:
 curl -X GET https://api.digitalocean.com/v2/firewalls -H "Authorization: Bearer $DIGITALOCEAN_ACCESS_TOKEN"
 ```
 
+# VPCS
+
+To create the droplet with a VPC (Virtual Private Cloud), provide a pre-existing VPC ID as a
+string.
+
+``` ruby
+driver:
+  vpcs:
+    - 3a92ae2d-f1b7-4589-81b8-8ef144374453
+```
+
+Note that your 'vpc_uuid' must be the numeric ids of your vpc. To get the
+numeric ID, use something like the following command to get them from the digital
+ocean API:
+
+``` bash
+curl -X GET https://api.digitalocean.com/v2/vpcs -H "Authorization: Bearer $DIGITALOCEAN_ACCESS_TOKEN"
+```
+
 
 # Development
 

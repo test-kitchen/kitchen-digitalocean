@@ -41,6 +41,8 @@ module Kitchen
       default_config :user_data, nil
       default_config :tags, nil
       default_config :firewalls, nil
+      default_config :vpcs, nil
+
 
       default_config :region do
         ENV['DIGITALOCEAN_REGION'] || 'nyc1'
@@ -194,6 +196,7 @@ module Kitchen
           private_networking: config[:private_networking],
           ipv6: config[:ipv6],
           user_data: config[:user_data],
+          vpc_uuid: config[:vpcs],
           tags: if config[:tags].is_a?(String)
                   config[:tags].split(/\s+|,\s+|,+/)
                 else

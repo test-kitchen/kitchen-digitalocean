@@ -1,3 +1,7 @@
+# 0.11.0 / 2020-05-18
+
+- Add support for VPC, closes issue #75
+
 # 0.10.7 / 2020-05-18
 
 - [@vsingh-msys] [PR #77] Remove unsupported default image mapping

@@ -126,7 +126,8 @@ describe Kitchen::Driver::Digitalocean do
         username: 'admin',
         port: '2222',
         server_name: 'puppy',
-        region: 'ams1'
+        region: 'ams1',
+        vpcs: '3a92ae2d-f1b7-4589-81b8-8ef144374453'
       }
 
       let(:config) { config }
