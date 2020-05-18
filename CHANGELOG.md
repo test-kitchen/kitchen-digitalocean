@@ -1,3 +1,7 @@
+# 0.10.7 / 2020-05-18
+
+- [@vsingh-msys] [PR #77] Remove unsupported default image mapping
+
 # 0.10.6 / 2020-03-25
 - [@zmaupin] [PR #74] Update default size to 1GB 
 - [@tolland] [PR #73] add fedora-31 and centos-8 slugs
