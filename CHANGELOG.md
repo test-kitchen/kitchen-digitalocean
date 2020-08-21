@@ -1,3 +1,7 @@
+# 0.11.1 / 2020-08-21
+
+- [@tas50] [PR #78] Optimize our requires
+
 # 0.11.0 / 2020-05-18
 
 - Add support for VPC, closes issue #75
@@ -7,7 +11,7 @@
 - [@vsingh-msys] [PR #77] Remove unsupported default image mapping
 
 # 0.10.6 / 2020-03-25
-- [@zmaupin] [PR #74] Update default size to 1GB 
+- [@zmaupin] [PR #74] Update default size to 1GB
 - [@tolland] [PR #73] add fedora-31 and centos-8 slugs
 - [@tas50] [PR #72] Test on the latest ruby releases
 
