@@ -17,12 +17,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'benchmark'
-require 'droplet_kit'
+require 'benchmark' unless defined?(Benchmark)
+require 'droplet_kit' unless defined?(DropletKit)
 require 'kitchen'
-require 'etc'
-require 'socket'
-require 'json'
+require 'etc' unless defined?(Etc)
+require 'socket' unless defined?(Socket)
+require 'json' unless defined?(JSON)
 
 module Kitchen
   module Driver
