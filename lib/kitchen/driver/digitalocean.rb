@@ -23,7 +23,7 @@ require 'kitchen'
 require 'etc' unless defined?(Etc)
 require 'socket' unless defined?(Socket)
 require 'json' unless defined?(JSON)
-autoload :YAML, "yaml"
+autoload :YAML, 'yaml'
 
 module Kitchen
   module Driver
@@ -43,7 +43,6 @@ module Kitchen
       default_config :tags, nil
       default_config :firewalls, nil
       default_config :vpcs, nil
-
 
       default_config :region do
         ENV['DIGITALOCEAN_REGION'] || 'nyc1'
