@@ -23,6 +23,7 @@ require 'kitchen'
 require 'etc' unless defined?(Etc)
 require 'socket' unless defined?(Socket)
 require 'json' unless defined?(JSON)
+autoload :YAML, "yaml"
 
 module Kitchen
   module Driver
@@ -108,7 +109,7 @@ module Kitchen
                      warn('firewalls attribute is not string/array, ignoring')
                      []
                    end
-          debug("firewall : #{fw_ids.inspect.to_yaml}")
+          debug("firewall : #{YAML.dump(fw_ids.inspect)}")
           fw_ids.each do |fw_id|
             firewall = client.firewalls.find(id: fw_id)
             if firewall
