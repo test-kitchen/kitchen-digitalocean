@@ -1,3 +1,7 @@
+# 0.11.2 / 2020-09-20
+
+- [@tas50] [PR #79] Swap to_yaml for YAML.dump
+
 # 0.11.1 / 2020-08-21
 
 - [@tas50] [PR #78] Optimize our requires
