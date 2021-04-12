@@ -1,15 +1,13 @@
 <img src="/assets/do_logo.png" alt="DO Logo">
 
-Now proudly sponsored by [DigitalOcean](https://www.digitalocean.com). 
+Now proudly sponsored by [DigitalOcean](https://www.digitalocean.com).
 
 [![Gem Version](https://badge.fury.io/rb/kitchen-digitalocean.svg)](http://badge.fury.io/rb/kitchen-digitalocean)
 [![Build Status](https://travis-ci.org/test-kitchen/kitchen-digitalocean.svg?branch=master)](https://travis-ci.org/test-kitchen/kitchen-digitalocean)
-[![Code Climate](https://codeclimate.com/github/test-kitchen/kitchen-digitalocean.svg)](https://codeclimate.com/github/test-kitchen/kitchen-digitalocean)
-[![Coverage Status](https://coveralls.io/repos/test-kitchen/kitchen-digitalocean/badge.svg?branch=master)](https://coveralls.io/r/test-kitchen/kitchen-digitalocean?branch=master)
 
 # Kitchen::Digitalocean
 
-A Test Kitchen Driver for [DigitalOcean](https://www.digitalocean.com). 
+A Test Kitchen Driver for [DigitalOcean](https://www.digitalocean.com).
 
 Shamelessly copied from [RoboticCheese](https://github.com/RoboticCheese)'s
 awesome work on an [Rackspace driver](https://github.com/RoboticCheese/kitchen-rackspace).
@@ -42,7 +40,7 @@ gem 'test-kitchen'
 gem 'kitchen-digitalocean'
 ```
 
-At minimum, you'll need to tell test-kitchen to use the digitalocean driver.
+At a minimum, you'll need to tell Test Kitchen to use the digitalocean driver.
 
 ```ruby
 ---
@@ -60,7 +58,7 @@ export DIGITALOCEAN_SSH_KEY_IDS="1234, 5678"
 ```
 
 Note that your `SSH_KEY_ID` must be the numeric id of your ssh key, not the symbolic name. To get the numeric ID
-of your keys, use something like to following command to get them from the digital ocean API:
+of your keys, use something like the following command to get them from the digital ocean API:
 
 ```bash
 curl -X GET https://api.digitalocean.com/v2/account/keys -H "Authorization: Bearer $DIGITALOCEAN_ACCESS_TOKEN"
@@ -107,26 +105,20 @@ driver:
   - ipv6: true
 ```
 
-# Image abbrevations we use
+# Image abbreviations we use
 
 This is a list of abbreviate image names we provide
 
 ```
-centos-6
 centos-7
 centos-8
-coreos-stable
-oreos-beta
-coreos-alpha
 debian-9
 debian-10
-fedora-30
-fedora-31
 fedora-32
+fedora-33
 freebsd-11
 freebsd-12
 ubuntu-16
-ubuntu-17
 ubuntu-18
 ubuntu-20
 ```
@@ -137,6 +129,7 @@ ubuntu-20
 nyc1    New York 1
 sfo1    San Francisco 1
 ams2    Amsterdam 2
+ams3    Amsterdam 3
 sgp1    Singapore 1
 lon1    London 1
 nyc3    New York 3
@@ -144,6 +137,7 @@ ams3    Amsterdam 3
 fra1    Frankfurt 1
 tor1    Toronto 1
 sfo2    San Francisco 2
+sfo3    San Francisco 3
 blr1    Bangalore 1
 ```
 
@@ -155,7 +149,7 @@ their own geographic region without hard coding configs.
 export DIGITALOCEAN_REGION="tor1"
 ```
 
-This allows futher customization by allowing overrides at the `driver` level and the `platform`
+This allows further customization by allowing overrides at the `driver` level and the `platform`
 level.
 
 ```ruby
@@ -231,7 +225,7 @@ driver:
 ```
 
 Note that your `firewalls` must be the numeric ids of your firewall. To get the
-numeric ID, use something like to following command to get them from the digital
+numeric ID, use something like to the following command to get them from the digital
 ocean API:
 
 ```bash
@@ -257,7 +251,6 @@ ocean API:
 curl -X GET https://api.digitalocean.com/v2/vpcs -H "Authorization: Bearer $DIGITALOCEAN_ACCESS_TOKEN"
 ```
 
-
 # Development
 
 * Source hosted at [GitHub](https://github.com/test-kitchen/kitchen-digitalocean)
@@ -271,7 +264,7 @@ example:
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+5. Create a new Pull Request
 
 # Authors
 
@@ -284,4 +277,3 @@ Created and maintained by [Greg Fitzgerald](https://github.com/gregf/) (<greg@gr
 # License
 
 Apache 2.0 (see [LICENSE](https://github.com/test-kitchen/kitchen-digitalocean/blob/master/LICENSE.txt))
-
