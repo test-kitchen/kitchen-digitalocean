@@ -25,7 +25,7 @@ There are no external system requirements for this driver. However you will need
 
 # Installation and Setup
 
-You'll need to install the gem on your development machine.
+If you're using [Chef Workstation](https://community.chef.io/tools/chef-workstation/) then kitchen-digitalocean is built-in. If not you'll need to install kitchen-digital via gem:
 
 ```bash
 gem install kitchen-digitalocean
@@ -36,7 +36,6 @@ or add it to your Gemfile if you are using [Bundler](http://bundler.io/)
 ```ruby
 source 'https://rubygems.org'
 
-gem 'test-kitchen'
 gem 'kitchen-digitalocean'
 ```
 
