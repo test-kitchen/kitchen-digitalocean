@@ -1,3 +1,12 @@
+# 0.12.0 / 2021-04-12
+
+- Update all the platform slugs for the latest versions available in DigitalOcean
+  - Remove CoreOS
+  - Remoe Ubuntu17
+  - Remove CentOS6
+  - Add RancherOS
+- Move the getting started docs to the new docs page at https://kitchen.ci/docs/drivers/digitalocean/
+
 # 0.11.2 / 2020-09-20
 
 - [@tas50] [PR #79] Swap to_yaml for YAML.dump
@@ -15,22 +24,27 @@
 - [@vsingh-msys] [PR #77] Remove unsupported default image mapping
 
 # 0.10.6 / 2020-03-25
+
 - [@zmaupin] [PR #74] Update default size to 1GB
 - [@tolland] [PR #73] add fedora-31 and centos-8 slugs
 - [@tas50] [PR #72] Test on the latest ruby releases
 
 # 0.10.5 / 2019-10-22
+
 - Add Debian-10 and FreeBSD-12 image aliases
 
 # 0.10.4 / 2019-06-28
+
 - [@bdausses] [PR #67] Added ability to apply monitoring at droplet creation.
 - [@tolland] [PR #69] adding new slugs
 - [@esoterick] [PR #70] feature: default region environment variable
 
 # 0.10.3 / 2019-03-20
+
 - Loosen dependencies
 
 # 0.10.2 / 2019-02-15
+
 - Update gem versions
 - Expose ipv4 address in debug information
 - Fix rubocop warnings
