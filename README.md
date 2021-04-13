@@ -1,15 +1,13 @@
 <img src="/assets/do_logo.png" alt="DO Logo">
 
-Now proudly sponsored by [DigitalOcean](https://www.digitalocean.com). 
+Now proudly sponsored by [DigitalOcean](https://www.digitalocean.com).
 
 [![Gem Version](https://badge.fury.io/rb/kitchen-digitalocean.svg)](http://badge.fury.io/rb/kitchen-digitalocean)
 [![Build Status](https://travis-ci.org/test-kitchen/kitchen-digitalocean.svg?branch=master)](https://travis-ci.org/test-kitchen/kitchen-digitalocean)
-[![Code Climate](https://codeclimate.com/github/test-kitchen/kitchen-digitalocean.svg)](https://codeclimate.com/github/test-kitchen/kitchen-digitalocean)
-[![Coverage Status](https://coveralls.io/repos/test-kitchen/kitchen-digitalocean/badge.svg?branch=master)](https://coveralls.io/r/test-kitchen/kitchen-digitalocean?branch=master)
 
 # Kitchen::Digitalocean
 
-A Test Kitchen Driver for [DigitalOcean](https://www.digitalocean.com). 
+A Test Kitchen Driver for [DigitalOcean](https://www.digitalocean.com).
 
 Shamelessly copied from [RoboticCheese](https://github.com/RoboticCheese)'s
 awesome work on an [Rackspace driver](https://github.com/RoboticCheese/kitchen-rackspace).
@@ -27,7 +25,7 @@ There are no external system requirements for this driver. However you will need
 
 # Installation and Setup
 
-You'll need to install the gem on your development machine.
+If you're using [Chef Workstation](https://community.chef.io/tools/chef-workstation/) then kitchen-digitalocean is built-in. If not you'll need to install kitchen-digital via gem:
 
 ```bash
 gem install kitchen-digitalocean
@@ -38,225 +36,12 @@ or add it to your Gemfile if you are using [Bundler](http://bundler.io/)
 ```ruby
 source 'https://rubygems.org'
 
-gem 'test-kitchen'
 gem 'kitchen-digitalocean'
 ```
 
-At minimum, you'll need to tell test-kitchen to use the digitalocean driver.
+# Getting Started
 
-```ruby
----
-driver:
-  name: digitalocean
-platforms:
-  - name: ubuntu-17
-```
-
-You also have the option of providing your credentials from environment variables.
-
-```bash
-export DIGITALOCEAN_ACCESS_TOKEN="1234"
-export DIGITALOCEAN_SSH_KEY_IDS="1234, 5678"
-```
-
-Note that your `SSH_KEY_ID` must be the numeric id of your ssh key, not the symbolic name. To get the numeric ID
-of your keys, use something like to following command to get them from the digital ocean API:
-
-```bash
-curl -X GET https://api.digitalocean.com/v2/account/keys -H "Authorization: Bearer $DIGITALOCEAN_ACCESS_TOKEN"
-```
-
-Please refer to the [Getting Started Guide](http://kitchen.ci/) for any further documentation.
-
-# Default Configuration
-
-The driver now uses api v2 which provides slugs for image names, sizes, and regions.
-
-Example configuration:
-
-```ruby
----
-platforms:
-- name: debian-7-0-x64
-  driver_config:
-    region: ams1
-- name: centos-6-4-x64
-  driver_config:
-    size: 2gb
-# ...
-```
-
-# Private Networking
-
-Private networking is enabled by default, but will only work in certain regions. You can disable private networking by changing private_networking to
-false. Example below.
-
-```ruby
----
-driver:
-  - private_networking: false
-```
-
-# IPv6
-
-IPv6 is disabled by default, you can enable this if needed. IPv6 is only available in limited regions.
-
-```ruby
----
-driver:
-  - ipv6: true
-```
-
-# Image abbrevations we use
-
-This is a list of abbreviate image names we provide
-
-```
-centos-6
-centos-7
-centos-8
-coreos-stable
-oreos-beta
-coreos-alpha
-debian-9
-debian-10
-fedora-30
-fedora-31
-fedora-32
-freebsd-11
-freebsd-12
-ubuntu-16
-ubuntu-17
-ubuntu-18
-ubuntu-20
-```
-
-# Regions
-
-```
-nyc1    New York 1
-sfo1    San Francisco 1
-ams2    Amsterdam 2
-sgp1    Singapore 1
-lon1    London 1
-nyc3    New York 3
-ams3    Amsterdam 3
-fra1    Frankfurt 1
-tor1    Toronto 1
-sfo2    San Francisco 2
-blr1    Bangalore 1
-```
-
-By default your droplets will be built in `nyc1` but you can change the default by updating the
-environment variable.  This should allow teams with developers across different regions to test within
-their own geographic region without hard coding configs.
-
-```bash
-export DIGITALOCEAN_REGION="tor1"
-```
-
-This allows futher customization by allowing overrides at the `driver` level and the `platform`
-level.
-
-```ruby
-# DIGITALOCEAN_REGION="tor1" # set as an env var
-
-# cookbook1/.kitchen.yml
----
-driver:
-  name: digitalocean
-  region: sgp1
-platforms:
-  - name: ubuntu-16
-  - name: ubuntu-18
-    region: sfo1
-
-# cookbook2/.kitchen.yml
----
-driver:
-  name: digitalocean
-platforms:
-  - name: ubuntu-16
-  - name: ubuntu-18
-    region: sfo1
-```
-
-The above configuration when full tested would create the following images in their respective
-regions.
-
-|Image|Region|
-|---|---|
-|cookbook1-ubuntu-16|sgp1|
-|cookbook1-ubuntu-18|sfo1|
-|cookbook2-ubuntu-16|tor1|
-|cookbook2-ubuntu-18|sfo1|
-
-# Tags
-
-To add tags to the droplet, provide the tags attribute.
-
-```ruby
-driver:
-  tags:
-    - test-kitchen
-    - this-is-a-tag
-```
-
-# Monitoring
-
-DigitalOcean provides a monitoring agent that you can optionally install to your
-droplet.  To enable this feature, set the monitoring attribute to true.
-
-```ruby
----
-driver:
-  - monitoring: true
-```
-
-# Firewall
-
-To create the droplet with firewalls, provide a pre-existing firewall ID as a
-string or list of strings.
-
-```ruby
-driver:
-  firewalls:
-    - 7a489167-a3d5-4d93-9f4a-371bd02ea8a3
-    - 624c1408-f101-4b59-af64-99c7f7560f7a
-```
-or
-```ruby
-driver:
-  firewalls: 624c1408-f101-4b59-af64-99c7f7560f7a
-```
-
-Note that your `firewalls` must be the numeric ids of your firewall. To get the
-numeric ID, use something like to following command to get them from the digital
-ocean API:
-
-```bash
-curl -X GET https://api.digitalocean.com/v2/firewalls -H "Authorization: Bearer $DIGITALOCEAN_ACCESS_TOKEN"
-```
-
-# VPCS
-
-To create the droplet with a VPC (Virtual Private Cloud), provide a pre-existing VPC ID as a
-string.
-
-``` ruby
-driver:
-  vpcs:
-    - 3a92ae2d-f1b7-4589-81b8-8ef144374453
-```
-
-Note that your `vpc_uuid` must be the numeric ids of your vpc. To get the
-numeric ID, use something like the following command to get them from the digital
-ocean API:
-
-``` bash
-curl -X GET https://api.digitalocean.com/v2/vpcs -H "Authorization: Bearer $DIGITALOCEAN_ACCESS_TOKEN"
-```
-
+For help getting started check the [kitchen.ci DigitalOcean Driver documentation](https://kitchen.ci/docs/drivers/digitalocean/)
 
 # Development
 
@@ -271,7 +56,7 @@ example:
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Added some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+5. Create a new Pull Request
 
 # Authors
 
@@ -284,4 +69,3 @@ Created and maintained by [Greg Fitzgerald](https://github.com/gregf/) (<greg@gr
 # License
 
 Apache 2.0 (see [LICENSE](https://github.com/test-kitchen/kitchen-digitalocean/blob/master/LICENSE.txt))
-

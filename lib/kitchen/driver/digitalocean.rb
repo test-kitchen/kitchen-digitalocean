@@ -60,22 +60,16 @@ module Kitchen
       required_config :ssh_key_ids
 
       PLATFORM_SLUG_MAP = {
-        'centos-6' => 'centos-6-x64',
         'centos-7' => 'centos-7-x64',
         'centos-8' => 'centos-8-x64',
-        'coreos-stable' => 'coreos-stable',
-        'coreos-beta' => 'coreos-beta',
-        'coreos-alpha' => 'coreos-alpha',
         'debian-9' => 'debian-9-x64',
         'debian-10' => 'debian-10-x64',
-        'fedora-30' => 'fedora-30-x64',
-        'fedora-31' => 'fedora-31-x64',
         'fedora-32' => 'fedora-32-x64',
+        'fedora-33' => 'fedora-33-x64',
         'freebsd-11' => 'freebsd-11-x64-zfs',
         'freebsd-12' => 'freebsd-12-x64-zfs',
         'ubuntu-16' => 'ubuntu-16-04-x64',
         'ubuntu-18' => 'ubuntu-18-04-x64',
-        'ubuntu-19' => 'ubuntu-19-10-x64',
         'ubuntu-20' => 'ubuntu-20-04-x64'
       }.freeze
 
