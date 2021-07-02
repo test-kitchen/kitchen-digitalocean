@@ -18,9 +18,8 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.5"
 
   spec.add_dependency 'droplet_kit', '>= 3.7', '< 4.0'
-  spec.add_dependency 'test-kitchen', '>= 1.17', '< 3'
+  spec.add_dependency 'test-kitchen', '>= 1.17', '< 4'
 
-  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'cane', '~> 3.0'
   spec.add_development_dependency 'countloc', '~> 0.4'
   spec.add_development_dependency 'coveralls', '~> 0.8'
