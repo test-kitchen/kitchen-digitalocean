@@ -1,3 +1,8 @@
+# 0.13.0 / 2021-07-02
+
+- Switch to Chefstyle for Ruby linting
+- Support Test Kitchen 3.0
+
 # 0.12.0 / 2021-04-12
 
 - Update all the platform slugs for the latest versions available in DigitalOcean
