@@ -15,37 +15,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'rspec'
-require 'webmock/rspec'
-require 'simplecov'
-require 'simplecov-console'
-require 'coveralls'
+require "rspec"
+require "webmock/rspec"
+require "simplecov"
+require "simplecov-console"
+require "coveralls"
 
 SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter.new([
                                                                  Coveralls::SimpleCov::Formatter,
                                                                  SimpleCov::Formatter::HTMLFormatter,
-                                                                 SimpleCov::Formatter::Console
+                                                                 SimpleCov::Formatter::Console,
                                                                ])
 SimpleCov.start
 
 WebMock.disable_net_connect!(allow_localhost: true)
 
-require_relative '../lib/kitchen/driver/digitalocean'
+require_relative "../lib/kitchen/driver/digitalocean"
 
 def create
-  File.read(File.join(File.dirname(__FILE__), 'mocks', 'create.txt'))
+  File.read(File.join(File.dirname(__FILE__), "mocks", "create.txt"))
 end
 
 def delete
-  File.read(File.join(File.dirname(__FILE__), 'mocks', 'delete.txt'))
+  File.read(File.join(File.dirname(__FILE__), "mocks", "delete.txt"))
 end
 
 def auth_error
-  File.read(File.join(File.dirname(__FILE__), 'mocks', 'auth_error.txt'))
+  File.read(File.join(File.dirname(__FILE__), "mocks", "auth_error.txt"))
 end
 
 def find
-  File.read(File.join(File.dirname(__FILE__), 'mocks', 'find.txt'))
+  File.read(File.join(File.dirname(__FILE__), "mocks", "find.txt"))
 end
 
 # vim: ai et ts=2 sts=2 sw=2 ft=ruby

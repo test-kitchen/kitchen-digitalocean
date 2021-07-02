@@ -17,13 +17,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'benchmark' unless defined?(Benchmark)
-require 'droplet_kit' unless defined?(DropletKit)
-require 'kitchen'
-require 'etc' unless defined?(Etc)
-require 'socket' unless defined?(Socket)
-require 'json' unless defined?(JSON)
-autoload :YAML, 'yaml'
+require "benchmark" unless defined?(Benchmark)
+require "droplet_kit" unless defined?(DropletKit)
+require "kitchen"
+require "etc" unless defined?(Etc)
+require "socket" unless defined?(Socket)
+require "json" unless defined?(JSON)
+autoload :YAML, "yaml"
 
 module Kitchen
   module Driver
@@ -31,9 +31,9 @@ module Kitchen
     #
     # @author Greg Fitzgerald <greg@gregf.org>
     class Digitalocean < Kitchen::Driver::SSHBase
-      default_config :username, 'root'
-      default_config :port, '22'
-      default_config :size, 's-1vcpu-1gb'
+      default_config :username, "root"
+      default_config :port, "22"
+      default_config :size, "s-1vcpu-1gb"
       default_config :monitoring, false
       default_config(:image, &:default_image)
       default_config(:server_name, &:default_name)
@@ -45,32 +45,32 @@ module Kitchen
       default_config :vpcs, nil
 
       default_config :region do
-        ENV['DIGITALOCEAN_REGION'] || 'nyc1'
+        ENV["DIGITALOCEAN_REGION"] || "nyc1"
       end
 
       default_config :digitalocean_access_token do
-        ENV['DIGITALOCEAN_ACCESS_TOKEN']
+        ENV["DIGITALOCEAN_ACCESS_TOKEN"]
       end
 
       default_config :ssh_key_ids do
-        ENV['DIGITALOCEAN_SSH_KEY_IDS'] || ENV['SSH_KEY_IDS']
+        ENV["DIGITALOCEAN_SSH_KEY_IDS"] || ENV["SSH_KEY_IDS"]
       end
 
       required_config :digitalocean_access_token
       required_config :ssh_key_ids
 
       PLATFORM_SLUG_MAP = {
-        'centos-7' => 'centos-7-x64',
-        'centos-8' => 'centos-8-x64',
-        'debian-9' => 'debian-9-x64',
-        'debian-10' => 'debian-10-x64',
-        'fedora-32' => 'fedora-32-x64',
-        'fedora-33' => 'fedora-33-x64',
-        'freebsd-11' => 'freebsd-11-x64-zfs',
-        'freebsd-12' => 'freebsd-12-x64-zfs',
-        'ubuntu-16' => 'ubuntu-16-04-x64',
-        'ubuntu-18' => 'ubuntu-18-04-x64',
-        'ubuntu-20' => 'ubuntu-20-04-x64'
+        "centos-7" => "centos-7-x64",
+        "centos-8" => "centos-8-x64",
+        "debian-9" => "debian-9-x64",
+        "debian-10" => "debian-10-x64",
+        "fedora-32" => "fedora-32-x64",
+        "fedora-33" => "fedora-33-x64",
+        "freebsd-11" => "freebsd-11-x64-zfs",
+        "freebsd-12" => "freebsd-12-x64-zfs",
+        "ubuntu-16" => "ubuntu-16-04-x64",
+        "ubuntu-18" => "ubuntu-18-04-x64",
+        "ubuntu-20" => "ubuntu-20-04-x64",
       }.freeze
 
       def create(state)
@@ -85,21 +85,21 @@ module Kitchen
           droplet = client.droplets.find(id: state[:server_id])
 
           break if droplet && droplet.networks[:v4] &&
-                   droplet.networks[:v4].any? { |n| n[:type] == 'public' }
+            droplet.networks[:v4].any? { |n| n[:type] == "public" }
         end
         droplet ||= client.droplets.find(id: state[:server_id])
 
         state[:hostname] = droplet.networks[:v4]
-                                  .find { |n| n[:type] == 'public' }['ip_address']
+          .find { |n| n[:type] == "public" }["ip_address"]
 
         if config[:firewalls]
-          debug('trying to add the firewall by id')
+          debug("trying to add the firewall by id")
           fw_ids = if config[:firewalls].is_a?(String)
                      config[:firewalls].split(/\s+|,\s+|,+/)
                    elsif config[:firewalls].is_a?(Array)
                      config[:firewalls]
                    else
-                     warn('firewalls attribute is not string/array, ignoring')
+                     warn("firewalls attribute is not string/array, ignoring")
                      []
                    end
           debug("firewall : #{YAML.dump(fw_ids.inspect)}")
@@ -107,7 +107,7 @@ module Kitchen
             firewall = client.firewalls.find(id: fw_id)
             if firewall
               client.firewalls
-                    .add_droplets([droplet.id], id: firewall.id)
+                .add_droplets([droplet.id], id: firewall.id)
               debug("firewall added: #{firewall.id}")
             else
               warn("firewalls id: '#{fw_id}' was not found in api, ignoring")
@@ -129,7 +129,7 @@ module Kitchen
 
           break unless droplet
 
-          if droplet.status != 'new'
+          if droplet.status != "new"
             client.droplets.delete(id: state[:server_id])
             break
           end
@@ -162,11 +162,11 @@ module Kitchen
       # Total:        63
       def default_name
         [
-          instance.name.gsub(/\W/, '')[0..14],
-          (Etc.getlogin || 'nologin').gsub(/\W/, '')[0..14],
-          Socket.gethostname.gsub(/\W/, '')[0..22],
-          Array.new(7) { rand(36).to_s(36) }.join
-        ].join('-').tr('_', '-')
+          instance.name.gsub(/\W/, "")[0..14],
+          (Etc.getlogin || "nologin").gsub(/\W/, "")[0..14],
+          Socket.gethostname.gsub(/\W/, "")[0..22],
+          Array.new(7) { rand(36).to_s(36) }.join,
+        ].join("-").tr("_", "-")
       end
 
       private
@@ -201,8 +201,8 @@ module Kitchen
         resp = client.droplets.create(droplet)
 
         if resp.class != DropletKit::Droplet
-          error JSON.parse(resp)['message']
-          error 'Please check your access token is set correctly.'
+          error JSON.parse(resp)["message"]
+          error "Please check your access token is set correctly."
         else
           resp
         end
