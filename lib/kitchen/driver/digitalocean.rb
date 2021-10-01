@@ -64,6 +64,7 @@ module Kitchen
         "centos-8" => "centos-8-x64",
         "debian-9" => "debian-9-x64",
         "debian-10" => "debian-10-x64",
+        "debian-11" => "debian-11-x64",
         "fedora-32" => "fedora-32-x64",
         "fedora-33" => "fedora-33-x64",
         "freebsd-11" => "freebsd-11-x64-zfs",
