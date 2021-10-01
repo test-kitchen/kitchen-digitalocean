@@ -1,3 +1,7 @@
+# 0.14.0 / 2021-10-01
+
+- Add Debian 11 slug
+
 # 0.13.0 / 2021-07-02
 
 - Switch to Chefstyle for Ruby linting
