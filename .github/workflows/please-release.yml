@@ -12,5 +12,5 @@ jobs:
       - uses: google-github-actions/release-please-action@v3
         with:
           release-type: ruby
-          package-name: kitchen-azurerm
-          version-file: lib/kitchen/driver/azurerm_version.rb
+          package-name: kitchen-digitalocean
+          version-file: lib/kitchen/driver/digitalocean_version.rb
