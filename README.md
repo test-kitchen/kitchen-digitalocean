@@ -1,11 +1,8 @@
-<img src="/assets/do_logo.png" alt="DO Logo">
 
-Now proudly sponsored by [DigitalOcean](https://www.digitalocean.com).
+# Kitchen::Digitalocean
 
 [![Gem Version](https://badge.fury.io/rb/kitchen-digitalocean.svg)](http://badge.fury.io/rb/kitchen-digitalocean)
 [![Build Status](https://travis-ci.org/test-kitchen/kitchen-digitalocean.svg?branch=master)](https://travis-ci.org/test-kitchen/kitchen-digitalocean)
-
-# Kitchen::Digitalocean
 
 A Test Kitchen Driver for [DigitalOcean](https://www.digitalocean.com).
 

@@ -18,7 +18,7 @@ Archive of changelog entries pre-please-release.
   - Remoe Ubuntu17
   - Remove CentOS6
   - Add RancherOS
-- Move the getting started docs to the new docs page at https://kitchen.ci/docs/drivers/digitalocean/
+- Move the getting started docs to the new docs page at <https://kitchen.ci/docs/drivers/digitalocean/>
 
 ## 0.11.2 / 2020-09-20
 
