@@ -154,9 +154,9 @@ From this version on the driver uses API V2, the use of image_id, flavor_id, and
 ## 0.7.2 / 2014-07-24
 
 - [@RoboticCheese](https://github.com/RoboticCheese) [PR #20] Update to latest image IDs
-- [@ijin](https://github.com/ijin)[PR #19] Update image id list & readme
-- [@ishakir](https://github.com/ishakir)[PR #18] Gemfile syntax incorrect
-- [@alaa](https://github.com/alaa)[PR #17] Update ssh_key API in the README file
+- [@ijin](https://github.com/ijin) [PR #19] Update image id list & readme
+- [@ishakir](https://github.com/ishakir) [PR #18] Gemfile syntax incorrect
+- [@alaa](https://github.com/alaa) [PR #17] Update ssh_key API in the README file
 
 ## 0.7.1 / 2014-06-23
 
