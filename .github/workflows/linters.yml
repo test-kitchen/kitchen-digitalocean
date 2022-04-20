@@ -1,5 +1,5 @@
 ---
-name: linters
+name: lint-unit
 
 'on':
   pull_request:
