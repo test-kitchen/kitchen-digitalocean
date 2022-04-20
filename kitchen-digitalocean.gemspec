@@ -15,12 +15,11 @@ Gem::Specification.new do |spec|
   spec.files         = `git ls-files`.split($INPUT_RECORD_SEPARATOR).grep(/LICENSE|^lib/)
   spec.require_paths = ["lib"]
 
-  spec.required_ruby_version = ">= 2.6"
+  spec.required_ruby_version = ">= 2.7"
 
   spec.add_dependency "droplet_kit", ">= 3.7", "< 4.0"
   spec.add_dependency "test-kitchen", ">= 1.17", "< 4"
 
-  spec.add_development_dependency "cane", "~> 3.0"
   spec.add_development_dependency "countloc", "~> 0.4"
   spec.add_development_dependency "coveralls", "~> 0.8"
   spec.add_development_dependency "rake"

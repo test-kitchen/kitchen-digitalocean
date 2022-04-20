@@ -1,17 +1,14 @@
 require "bundler/gem_tasks"
-require "chefstyle"
-require "rubocop/rake_task"
-require "cane/rake_task"
 require "rspec/core/rake_task"
 
-desc "Run Cane to check quality metrics"
-Cane::RakeTask.new
-
-desc "Run RuboCop on the lib directory"
-RuboCop::RakeTask.new(:rubocop) do |task|
-  task.patterns = ["lib/**/*.rb"]
-  # don't abort rake on failure
-  task.fail_on_error = false
+begin
+  require "chefstyle"
+  require "rubocop/rake_task"
+  RuboCop::RakeTask.new(:style) do |task|
+    task.options += ["--display-cop-names", "--no-color"]
+  end
+rescue LoadError
+  puts "chefstyle is not available. (sudo) gem install chefstyle to do style checking."
 end
 
 desc "Display LOC stats"
@@ -23,6 +20,6 @@ end
 desc "Run RSpec unit tests"
 RSpec::Core::RakeTask.new(:spec)
 
-task default: %i{rubocop loc spec}
+task default: %i{style loc spec}
 
 # vim: ai et ts=2 sts=2 sw=2 ft=ruby fdm=marker
