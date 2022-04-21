@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.14.2](https://github.com/test-kitchen/kitchen-digitalocean/compare/v0.14.1...v0.14.2) (2022-04-20)
+
+
+### Features
+
+* Use reusable GitHub workflows for testing ([#109](https://github.com/test-kitchen/kitchen-digitalocean/issues/109)) ([fd9d50c](https://github.com/test-kitchen/kitchen-digitalocean/commit/fd9d50cc9678a08b773a84d772cbae5c6eeab8fc))
+
 ## [0.14.1](https://github.com/test-kitchen/kitchen-digitalocean/compare/v0.14.0...v0.14.1) (2022-04-20)
 
 
