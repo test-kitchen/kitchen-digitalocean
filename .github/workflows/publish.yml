@@ -20,7 +20,7 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
 
       - name: Build and publish to GitHub Package
-        uses: jstastny/publish-gem-to-github@master
+        uses: actionshub/publish-gem-to-rubygems@v0.0.1
         if: ${{ steps.release.outputs.release_created }}
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
