@@ -44,6 +44,10 @@ module Kitchen
       default_config :firewalls, nil
       default_config :vpcs, nil
 
+      default_config :api_url do
+        ENV["DIGITALOCEAN_API_URL"] || "https://api.digitalocean.com"
+      end
+
       default_config :region do
         ENV["DIGITALOCEAN_REGION"] || "nyc1"
       end
@@ -175,7 +179,7 @@ module Kitchen
       def client
         debug_client_config
 
-        DropletKit::Client.new(access_token: config[:digitalocean_access_token])
+        DropletKit::Client.new(access_token: config[:digitalocean_access_token], api_url: config[:api_url])
       end
 
       def create_server
