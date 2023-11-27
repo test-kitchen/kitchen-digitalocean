@@ -16,7 +16,7 @@ jobs:
           version-file: lib/kitchen/driver/digitalocean_version.rb
 
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         if: ${{ steps.release.outputs.release_created }}
 
       - name: Build and publish to GitHub Package
