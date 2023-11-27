@@ -1,6 +1,14 @@
 source "https://rubygems.org"
 
-# Specify your gem's dependencies in kitchen-digitalocean.gemspec
 gemspec
 
-# vim: ai et ts=2 sts=2 sw=2 ft=ruby
+group :test do
+  gem 'bundler'
+  gem 'rake'
+  gem 'rspec', '~> 3.2'
+  gem "webmock", "~> 3.5"
+end
+
+group :chefstyle do
+  gem "chefstyle", "2.2.3"
+end
