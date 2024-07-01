@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.1](https://github.com/test-kitchen/kitchen-digitalocean/compare/v0.16.0...v0.16.1) (2024-07-01)
+
+
+### Bug Fixes
+
+* release please configs ([#122](https://github.com/test-kitchen/kitchen-digitalocean/issues/122)) ([06128ab](https://github.com/test-kitchen/kitchen-digitalocean/commit/06128abd1a362fe5cc95b26bdf86a095c35a11c0))
+
 ## [0.16.0](https://github.com/test-kitchen/kitchen-digitalocean/compare/v0.15.0...v0.16.0) (2023-11-27)
 
 
