@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.16.2](https://github.com/test-kitchen/kitchen-digitalocean/compare/v0.16.1...v0.16.2) (2026-01-22)
+
+
+### Bug Fixes
+
+* bump tk dep &lt;5 ([#126](https://github.com/test-kitchen/kitchen-digitalocean/issues/126)) ([ab83887](https://github.com/test-kitchen/kitchen-digitalocean/commit/ab83887ebca0ce1a08d7fa70f9148cd80f1ebc06))
+
 ## [0.16.1](https://github.com/test-kitchen/kitchen-digitalocean/compare/v0.16.0...v0.16.1) (2024-07-01)
 
 
