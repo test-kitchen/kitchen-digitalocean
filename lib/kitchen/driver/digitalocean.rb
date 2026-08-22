@@ -154,7 +154,7 @@ module Kitchen
       # provided if it can't find a mapping.
       def default_image
         PLATFORM_SLUG_MAP.fetch(instance.platform.name,
-                                instance.platform.name)
+          instance.platform.name)
       end
 
       # Generate what should be a unique server name up to 63 total chars
