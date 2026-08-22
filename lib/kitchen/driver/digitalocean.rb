@@ -30,7 +30,7 @@ module Kitchen
     # Digital Ocean driver for Kitchen.
     #
     # @author Greg Fitzgerald <greg@gregf.org>
-    class Digitalocean < Kitchen::Driver::SSHBase
+    class Digitalocean < Kitchen::Driver::Base
       default_config :username, "root"
       default_config :port, "22"
       default_config :size, "s-1vcpu-1gb"
@@ -120,7 +120,11 @@ module Kitchen
           end
         end
 
-        wait_for_sshd(state[:hostname]); print "(ssh ready)\n"
+        state[:username] = config[:username]
+        state[:port] = config[:port]
+
+        instance.transport.connection(state, &:wait_until_ready)
+        print "(ssh ready)\n"
         debug("digitalocean:create #{state[:hostname]}")
       end
 
@@ -154,7 +158,7 @@ module Kitchen
       # provided if it can't find a mapping.
       def default_image
         PLATFORM_SLUG_MAP.fetch(instance.platform.name,
-                                instance.platform.name)
+          instance.platform.name)
       end
 
       # Generate what should be a unique server name up to 63 total chars
