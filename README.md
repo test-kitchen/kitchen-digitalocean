@@ -166,14 +166,31 @@ matching DigitalOcean slug:
 
 | Platform name | Image slug |
 | --- | --- |
-| `almalinux-8`, `almalinux-9` | `almalinux-<v>-x64` |
-| `centos-7`, `centos-8` | `centos-<v>-x64` |
+| `almalinux-8` | `almalinux-8-x64` |
+| `almalinux-9` | `almalinux-9-x64` |
+| `centos-7` | `centos-7-x64` |
+| `centos-8` | `centos-8-x64` |
 | `centos-stream-9` | `centos-stream-9-x64` |
-| `debian-9` … `debian-13` | `debian-<v>-x64` |
-| `fedora-32`, `fedora-33`, `fedora-41`, `fedora-42` | `fedora-<v>-x64` |
-| `freebsd-11` … `freebsd-14` | `freebsd-<v>-x64-zfs` |
-| `rockylinux-8`, `rockylinux-9` | `rockylinux-<v>-x64` |
-| `ubuntu-16` … `ubuntu-24` | `ubuntu-<v>-04-x64` |
+| `debian-9` | `debian-9-x64` |
+| `debian-10` | `debian-10-x64` |
+| `debian-11` | `debian-11-x64` |
+| `debian-12` | `debian-12-x64` |
+| `debian-13` | `debian-13-x64` |
+| `fedora-32` | `fedora-32-x64` |
+| `fedora-33` | `fedora-33-x64` |
+| `fedora-41` | `fedora-41-x64` |
+| `fedora-42` | `fedora-42-x64` |
+| `freebsd-11` | `freebsd-11-x64-zfs` |
+| `freebsd-12` | `freebsd-12-x64-zfs` |
+| `freebsd-13` | `freebsd-13-x64-zfs` |
+| `freebsd-14` | `freebsd-14-x64-zfs` |
+| `rockylinux-8` | `rockylinux-8-x64` |
+| `rockylinux-9` | `rockylinux-9-x64` |
+| `ubuntu-16` | `ubuntu-16-04-x64` |
+| `ubuntu-18` | `ubuntu-18-04-x64` |
+| `ubuntu-20` | `ubuntu-20-04-x64` |
+| `ubuntu-22` | `ubuntu-22-04-x64` |
+| `ubuntu-24` | `ubuntu-24-04-x64` |
 
 Anything that is not in that list is passed to the API untouched, so you can use
 a full slug or a private image ID as the platform name directly:
@@ -315,43 +332,13 @@ doctl compute droplet list
 doctl compute droplet delete <droplet-name>
 ```
 
-## Development
-
-```bash
-git clone https://github.com/test-kitchen/kitchen-digitalocean.git
-cd kitchen-digitalocean
-bundle install
-```
-
-| Command | What it does |
-| --- | --- |
-| `bundle exec rake test` | Run the unit tests. |
-| `bundle exec rake coverage` | Run the unit tests with coverage reporting. |
-| `bundle exec rake style` | Run Cookstyle/Chefstyle. |
-| `bundle exec rake` | Run tests and style, the same gates CI applies. |
-| `bundle exec rake yard` | Build the API documentation into `doc/`. |
-| `bundle exec rake yard:server` | Browse the documentation at `http://localhost:8808`. |
-
-The test suite is entirely offline. Every DigitalOcean API call is stubbed with
-[WebMock](https://github.com/bblimke/webmock), and `WebMock.disable_net_connect!`
-makes an unstubbed request fail rather than reach the network, so the suite never
-creates a Droplet and never needs credentials.
-
-Documentation is not a CI gate, but `bundle exec yard stats --list-undoc` will
-tell you if something you added is missing docs.
-
 ## Contributing
+
+Pull requests are very welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for how to
+set up a checkout, run the tests, and get a change merged.
 
 * Source is hosted on [GitHub](https://github.com/test-kitchen/kitchen-digitalocean).
 * Report issues and feature requests on [GitHub Issues](https://github.com/test-kitchen/kitchen-digitalocean/issues).
-
-Pull requests are very welcome. Please include tests with your change:
-
-1. Fork the repository.
-1. Create a feature branch (`git checkout -b my-new-feature`).
-1. Make your change, with tests.
-1. Check it with `bundle exec rake`.
-1. Push the branch and open a pull request.
 
 ## Authors
 
