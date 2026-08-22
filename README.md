@@ -2,25 +2,24 @@
 # Kitchen::Digitalocean
 
 [![Gem Version](https://badge.fury.io/rb/kitchen-digitalocean.svg)](http://badge.fury.io/rb/kitchen-digitalocean)
-[![Build Status](https://travis-ci.org/test-kitchen/kitchen-digitalocean.svg?branch=master)](https://travis-ci.org/test-kitchen/kitchen-digitalocean)
 
 A Test Kitchen Driver for [DigitalOcean](https://www.digitalocean.com).
 
 Shamelessly copied from [RoboticCheese](https://github.com/RoboticCheese)'s
 awesome work on an [Rackspace driver](https://github.com/RoboticCheese/kitchen-rackspace).
 
-# Upgrading
+## Upgrading
 
 From this version forward the driver uses [API V2](https://developers.digitalocean.com/) only.
 Use of image_id, flavor_id, and region_id have been replaced with image, size, and region.
 You can now use slugs instead of relying on the old data.json to translate IDs.
 Please refer to the examples below, and the API documentation for more information.
 
-# Requirements
+## Requirements
 
 There are no external system requirements for this driver. However you will need access to an [DigitalOcean](https://digitalocean.com/) account.
 
-# Installation and Setup
+## Installation and Setup
 
 If you're using [Chef Workstation](https://community.chef.io/tools/chef-workstation/) then kitchen-digitalocean is built-in. If not you'll need to install kitchen-digital via gem:
 
@@ -36,11 +35,11 @@ source 'https://rubygems.org'
 gem 'kitchen-digitalocean'
 ```
 
-# Getting Started
+## Getting Started
 
 For help getting started check the [kitchen.ci DigitalOcean Driver documentation](https://kitchen.ci/docs/drivers/digitalocean/)
 
-# Development
+## Development
 
 * Source hosted at [GitHub](https://github.com/test-kitchen/kitchen-digitalocean)
 * Report issues/questions/feature requests on [GitHub Issues](https://github.com/test-kitchen/kitchen-digitalocean/issues)
@@ -55,7 +54,7 @@ example:
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
 
-# Authors
+## Authors
 
 Created and maintained by [Greg Fitzgerald](https://github.com/gregf/) (<greg@gregf.org>)
 
@@ -63,6 +62,6 @@ Created and maintained by [Greg Fitzgerald](https://github.com/gregf/) (<greg@gr
 
 [Will Farrington](https://github.com/wfarr/kitchen-digital_ocean), His fork was a help during the creation of my api v2 driver.
 
-# License
+## License
 
 Apache 2.0 (see [LICENSE](https://github.com/test-kitchen/kitchen-digitalocean/blob/master/LICENSE.txt))
