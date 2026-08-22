@@ -11,7 +11,10 @@ knows how to talk to DigitalOcean: it creates a Droplet, waits until SSH answers
 hands the address back to Test Kitchen, and deletes the Droplet when you are done.
 
 Droplets cost money for as long as they exist. Always finish with
-`kitchen destroy`, and see [Cleaning up](#cleaning-up) if a run is interrupted.
+`cinc kitchen destroy`, and see [Cleaning up](#cleaning-up) if a run is interrupted.
+
+> This documentation uses [Cinc Workstation](https://cinc.sh/) and the `cinc` commands throughout. Everything here
+> works identically with Chef Workstation — see [Using with Chef](#using-with-chef).
 
 ## Before you start
 
@@ -51,8 +54,8 @@ sure the key is loaded — check with `ssh-add -l`.
 
 ## Installation
 
-If you use [Chef Workstation](https://community.chef.io/tools/chef-workstation/),
-this driver is already bundled and you can skip ahead.
+If you use [Cinc Workstation](https://cinc.sh/start/workstation/), this driver is
+already bundled and you can skip ahead.
 
 Otherwise install the gem:
 
@@ -89,7 +92,7 @@ driver:
   size: s-1vcpu-1gb
 
 provisioner:
-  name: chef_zero
+  name: cinc_infra
 
 platforms:
   - name: ubuntu-24
@@ -104,18 +107,18 @@ suites:
 Then run it:
 
 ```bash
-kitchen test
+cinc kitchen test
 ```
 
 That creates a Droplet per platform, converges it, verifies it, and destroys it.
 While you are iterating, the individual steps are more useful:
 
 ```bash
-kitchen list              # what instances exist and what state they are in
-kitchen create            # build the Droplet only
-kitchen converge          # apply your configuration
-kitchen login             # SSH into the running Droplet
-kitchen destroy           # delete the Droplet
+cinc kitchen list         # what instances exist and what state they are in
+cinc kitchen create       # build the Droplet only
+cinc kitchen converge     # apply your configuration
+cinc kitchen login        # SSH into the running Droplet
+cinc kitchen destroy      # delete the Droplet
 ```
 
 ## Configuration
@@ -315,7 +318,7 @@ is loaded in your agent (`ssh-add -l`).
 Run Test Kitchen with debug logging:
 
 ```bash
-kitchen test --log-level debug
+cinc kitchen test --log-level debug
 ```
 
 The driver logs every resolved setting. The access token is masked in that
@@ -323,7 +326,7 @@ output, so debug logs are safe to paste into a bug report.
 
 ### Cleaning up
 
-If a run is interrupted, the Droplet may outlive it. `kitchen destroy` is the
+If a run is interrupted, the Droplet may outlive it. `cinc kitchen destroy` is the
 first thing to try. If Test Kitchen has lost track of the instance, delete it by
 name or tag:
 
@@ -331,6 +334,24 @@ name or tag:
 doctl compute droplet list
 doctl compute droplet delete <droplet-name>
 ```
+
+## Using with Chef
+
+This driver is not tied to Cinc. The examples above use Cinc Workstation and the
+`cinc_infra` provisioner, but the driver works exactly the same with
+[Chef Workstation](https://www.chef.io/downloads/tools/workstation) — run
+`kitchen` instead of `cinc kitchen`, and use `chef_infra` instead of
+`cinc_infra`:
+
+```yaml
+provisioner:
+  name: chef_infra
+
+verifier:
+  name: inspec
+```
+
+No driver configuration changes are needed.
 
 ## Contributing
 
