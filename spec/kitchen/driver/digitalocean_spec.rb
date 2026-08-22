@@ -1,7 +1,5 @@
-#
-# Author:: Jonathan Hartman (<j@p4nt5.com>)
-#
-# Copyright (C) 2013, Jonathan Hartman
+# frozen_string_literal: true
+
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,312 +13,819 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require_relative "../../spec_helper"
+require "spec_helper"
 
-require "logger"
-require "stringio" unless defined?(StringIO)
-require "rspec"
-require "kitchen"
+RSpec.describe Kitchen::Driver::Digitalocean do
+  subject(:driver) { build_driver }
 
-describe Kitchen::Driver::Digitalocean do
-  let(:logged_output) { StringIO.new }
-  let(:logger) { Logger.new(logged_output) }
-  let(:config) { {} }
   let(:state) { {} }
-  let(:instance_name) { "potatoes" }
-  let(:platform_name) { "ubuntu" }
 
-  let(:instance) do
-    double(
-      name: instance_name,
-      logger: logger,
-      to_str: "instance",
-      platform: double(name: platform_name),
-      transport: double(connection: true)
-    )
+  describe "plugin contract" do
+    it "is a Test Kitchen driver" do
+      expect(described_class.ancestors).to include(Kitchen::Driver::Base)
+    end
+
+    it "reports a display name Test Kitchen can use" do
+      expect(driver.name).to eq("Digitalocean")
+    end
+
+    it "is registered under the name used in kitchen.yml" do
+      expect(Kitchen::Driver.const_get(:Digitalocean)).to eq(described_class)
+    end
   end
 
-  let(:driver) { described_class.new(config) }
-
-  before(:each) do
-    allow_any_instance_of(described_class).to receive(:instance)
-      .and_return(instance)
-    ENV["DIGITALOCEAN_ACCESS_TOKEN"] = "access_token"
-    ENV["DIGITALOCEAN_SSH_KEY_IDS"] = "1234"
-  end
-
-  describe "#initialize" do
-    context "default options" do
-      it "defaults to the smallest size" do
-        expect(driver[:size]).to eq("s-1vcpu-1gb")
-      end
-
-      it "defaults to SSH with root user on port 22" do
-        expect(driver[:username]).to eq("root")
-        expect(driver[:port]).to eq("22")
-      end
-
-      it "defaults to a random server name" do
-        expect(driver[:server_name]).to be_a(String)
-      end
-
-      it "defaults to region id 1" do
-        expect(driver[:region]).to eq("nyc1")
-      end
-
-      it "defaults to SSH Key Ids from $SSH_KEY_IDS" do
-        expect(driver[:ssh_key_ids]).to eq("1234")
-      end
-
-      it "defaults to Access Token from $DIGITALOCEAN_ACCESS_TOKEN" do
-        expect(driver[:digitalocean_access_token]).to eq("access_token")
+  describe "configuration defaults" do
+    {
+      username: "root",
+      port: "22",
+      size: "s-1vcpu-1gb",
+      monitoring: false,
+      private_networking: true,
+      ipv6: false,
+      user_data: nil,
+      tags: nil,
+      firewalls: nil,
+      vpcs: nil,
+      api_url: "https://api.digitalocean.com",
+      region: "nyc1",
+    }.each do |key, value|
+      it "defaults #{key} to #{value.inspect}" do
+        expect(build_driver({})[key]).to eq(value)
       end
     end
 
-    context "DIGITALOCEAN_REGION is tor1" do
-      before(:each) do
-        allow_any_instance_of(described_class).to receive(:instance)
-          .and_return(instance)
-        ENV["DIGITALOCEAN_REGION"] = "tor1"
-      end
-      it "defaults to region from DIGITALOCEAN_REGION" do
-        expect(driver[:region]).to eq("tor1")
-      end
+    it "defaults the server name to a generated name" do
+      expect(build_driver({})[:server_name]).to match(/\Adefaultubuntu24-/)
     end
 
-    context "name is ubuntu-14-04-x64" do
-      let(:platform_name) { "ubuntu-14-04-x64" }
-
-      it "defaults to the correct image ID" do
-        expect(driver[:image]).to eq("ubuntu-14-04-x64")
-      end
+    it "defaults the image to the slug for the instance platform" do
+      expect(build_driver({})[:image]).to eq("ubuntu-24-04-x64")
     end
 
-    context "platform name matches a known platform => slug mapping" do
-      context "name is ubuntu-20" do
-        let(:platform_name) { "ubuntu-20" }
-        it "matches the correct image slug" do
-          expect(driver[:image]).to eq("ubuntu-20-04-x64")
-        end
-      end
+    it "polls on an interval that leaves room for a Droplet to boot" do
+      driver = Kitchen::Driver::Digitalocean.new(
+        digitalocean_access_token: "t", ssh_key_ids: "1"
+      ).finalize_config!(kitchen_instance)
+
+      expect(driver[:server_wait_interval]).to eq(8)
+      expect(driver[:server_wait_timeout]).to eq(600)
     end
 
-    context "overridden options" do
-      config = {
-        image: "debian-7-0-x64",
-        size: "1gb",
+    describe "overrides" do
+      overrides = {
+        image: "debian-13-x64",
+        size: "s-2vcpu-4gb",
         ssh_key_ids: "5678",
         username: "admin",
         port: "2222",
         server_name: "puppy",
-        region: "ams1",
+        region: "ams3",
+        monitoring: true,
+        ipv6: true,
+        user_data: "#cloud-config\n",
+        tags: %w{web db},
         vpcs: "3a92ae2d-f1b7-4589-81b8-8ef144374453",
+        api_url: "https://api.example.test",
+        server_wait_interval: 1,
+        server_wait_timeout: 30,
       }
 
-      let(:config) { config }
-
-      config.each do |key, value|
-        it "it uses the overridden #{key} option" do
-          expect(driver[key]).to eq(value)
+      overrides.each do |key, value|
+        it "honours an explicit #{key}" do
+          expect(build_driver(overrides)[key]).to eq(value)
         end
       end
     end
   end
 
-  describe "#create" do
-    let(:server) do
-      double(id: "1234", wait_for: true,
-             public_ip_address: "1.2.3.4")
+  describe "configuration from the environment" do
+    it "reads the access token from DIGITALOCEAN_ACCESS_TOKEN" do
+      ENV["DIGITALOCEAN_ACCESS_TOKEN"] = "env-token"
+      ENV["DIGITALOCEAN_SSH_KEY_IDS"] = "1"
+
+      expect(build_driver_without_defaults[:digitalocean_access_token]).to eq("env-token")
     end
 
-    let(:driver) { described_class.new(config) }
+    it "reads SSH key IDs from DIGITALOCEAN_SSH_KEY_IDS" do
+      ENV["DIGITALOCEAN_ACCESS_TOKEN"] = "t"
+      ENV["DIGITALOCEAN_SSH_KEY_IDS"] = "env-keys"
 
-    before(:each) do
-      {
-        default_name: "a_monkey!",
-        create_server: server,
-      }.each do |k, v|
-        allow_any_instance_of(described_class).to receive(k).and_return(v)
-      end
+      expect(build_driver_without_defaults[:ssh_key_ids]).to eq("env-keys")
     end
 
-    context "username and API key only provided" do
-      let(:config) do
-        {
-          digitalocean_access_token: "access_token",
-        }
-      end
+    it "falls back to SSH_KEY_IDS when DIGITALOCEAN_SSH_KEY_IDS is unset" do
+      ENV["DIGITALOCEAN_ACCESS_TOKEN"] = "t"
+      ENV["SSH_KEY_IDS"] = "legacy-keys"
 
-      it "generates a server name in the absence of one" do
-        stub_request(:get, "https://api.digitalocean.com/v2/droplets/1234")
-          .to_return(create)
-        driver.create(state)
-        expect(driver[:server_name]).to eq("a_monkey!")
-      end
-
-      it "gets a proper server ID" do
-        stub_request(:get, "https://api.digitalocean.com/v2/droplets/1234")
-          .to_return(create)
-        driver.create(state)
-        expect(state[:server_id]).to eq("1234")
-      end
-
-      it "gets a proper hostname (IP)" do
-        stub_request(:get, "https://api.digitalocean.com/v2/droplets/1234")
-          .to_return(create)
-        driver.create(state)
-        expect(state[:hostname]).to eq("1.2.3.4")
-      end
-    end
-  end
-
-  describe "#destroy" do
-    let(:server_id) { "12345" }
-    let(:hostname) { "example.com" }
-    let(:state) { { server_id: server_id, hostname: hostname } }
-    let(:server) { double(nil?: false, destroy: true) }
-    let(:servers) { double(get: server) }
-    let(:compute) { double(servers: servers) }
-
-    let(:driver) { described_class.new(config) }
-
-    before(:each) do
-      {
-        compute: compute,
-      }.each do |k, v|
-        allow_any_instance_of(described_class).to receive(k).and_return(v)
-      end
+      expect(build_driver_without_defaults[:ssh_key_ids]).to eq("legacy-keys")
     end
 
-    context "a live server that needs to be destroyed" do
-      it "destroys the server" do
-        stub_request(:get, "https://api.digitalocean.com/v2/droplets/12345")
-          .to_return(find)
-        stub_request(:delete, "https://api.digitalocean.com/v2/droplets/12345")
-          .to_return(delete)
-        expect(state).to receive(:delete).with(:server_id)
-        expect(state).to receive(:delete).with(:hostname)
-        driver.destroy(state)
-      end
+    it "prefers DIGITALOCEAN_SSH_KEY_IDS over SSH_KEY_IDS" do
+      ENV["DIGITALOCEAN_ACCESS_TOKEN"] = "t"
+      ENV["DIGITALOCEAN_SSH_KEY_IDS"] = "preferred"
+      ENV["SSH_KEY_IDS"] = "legacy"
+
+      expect(build_driver_without_defaults[:ssh_key_ids]).to eq("preferred")
     end
 
-    context "no server ID present" do
-      let(:state) { {} }
+    it "reads the region from DIGITALOCEAN_REGION" do
+      ENV["DIGITALOCEAN_REGION"] = "tor1"
 
-      it "does nothing" do
-        allow(driver).to receive(:compute)
-        expect(driver).not_to receive(:compute)
-        expect(state).not_to receive(:delete)
-        driver.destroy(state)
-      end
+      expect(build_driver({})[:region]).to eq("tor1")
     end
 
-    context "a server that was already destroyed" do
-      let(:servers) do
-        s = double("servers")
-        allow(s).to receive(:get).with("12345").and_return(nil)
-        s
-      end
-      let(:compute) { double(servers: servers) }
+    it "reads the API URL from DIGITALOCEAN_API_URL" do
+      ENV["DIGITALOCEAN_API_URL"] = "https://api.example.test"
 
-      let(:driver) { described_class.new(config) }
+      expect(build_driver({})[:api_url]).to eq("https://api.example.test")
+    end
 
-      before(:each) do
-        {
-          compute: compute,
-        }.each do |k, v|
-          allow_any_instance_of(described_class).to receive(k).and_return(v)
-        end
-      end
+    it "prefers explicit configuration over the environment" do
+      ENV["DIGITALOCEAN_REGION"] = "tor1"
 
-      it "does not try to destroy the server again" do
-        stub_request(:get, "https://api.digitalocean.com/v2/droplets/12345")
-          .to_return(find)
-        stub_request(:delete, "https://api.digitalocean.com/v2/droplets/12345")
-          .to_return(delete)
-        allow_message_expectations_on_nil
-        driver.destroy(state)
-      end
+      expect(build_driver(region: "lon1")[:region]).to eq("lon1")
     end
   end
 
-  describe "#create_server" do
-    let(:config) do
-      {
-        server_name: "hello",
-        image: "debian-7-0-x64",
-        size: "1gb",
-        region: "nyc3",
-      }
+  describe "required configuration" do
+    it "rejects a missing access token" do
+      expect { build_driver_without_defaults }
+        .to raise_error(Kitchen::UserError, /digitalocean_access_token/)
     end
-    before(:each) do
-      @expected = config.merge(name: config[:server_name])
-      @expected.delete_if do |k, _|
-        k == :server_name
+
+    it "rejects a missing ssh_key_ids" do
+      ENV["DIGITALOCEAN_ACCESS_TOKEN"] = "t"
+
+      expect { build_driver_without_defaults }
+        .to raise_error(Kitchen::UserError, /ssh_key_ids/)
+    end
+  end
+
+  describe "#default_image" do
+    described_class::PLATFORM_SLUG_MAP.each do |platform, slug|
+      it "maps the #{platform} platform to #{slug}" do
+        driver = build_driver({}, kitchen_instance(platform: platform))
+
+        expect(driver.default_image).to eq(slug)
       end
     end
-    let(:droplets) do
-      s = double("droplets")
-      allow(s).to receive(:create) { |arg| arg }
-      s
-    end
-    let(:client) { double(droplets: droplets) }
 
-    before(:each) do
-      allow_any_instance_of(described_class).to receive(:client)
-        .and_return(client)
+    it "passes an unmapped platform name straight through as a slug" do
+      driver = build_driver({}, kitchen_instance(platform: "ubuntu-24-04-x64"))
+
+      expect(driver.default_image).to eq("ubuntu-24-04-x64")
     end
 
-    it "creates the server using a compute connection" do
-      expect(driver.send(:create_server).to_h).to include(@expected)
+    it "passes a private image ID straight through" do
+      driver = build_driver({}, kitchen_instance(platform: "123456789"))
+
+      expect(driver.default_image).to eq("123456789")
+    end
+
+    describe "PLATFORM_SLUG_MAP" do
+      it "is frozen" do
+        expect(described_class::PLATFORM_SLUG_MAP).to be_frozen
+      end
+
+      it "only maps onto x64 slugs" do
+        expect(described_class::PLATFORM_SLUG_MAP.values).to all(include("x64"))
+      end
+
+      it "has no duplicate slugs" do
+        slugs = described_class::PLATFORM_SLUG_MAP.values
+
+        expect(slugs.uniq.length).to eq(slugs.length)
+      end
     end
   end
 
   describe "#default_name" do
-    let(:login) { "user" }
-    let(:hostname) { "host" }
-
-    before(:each) do
-      allow(Etc).to receive(:getlogin).and_return(login)
-      allow(Socket).to receive(:gethostname).and_return(hostname)
+    before do
+      allow(Etc).to receive(:getlogin).and_return("user")
+      allow(Socket).to receive(:gethostname).and_return("host")
     end
 
-    it "generates a name" do
-      expect(driver.default_name).to match(/^potatoes-user-host-(\S*)/)
+    it "joins the instance name, login, hostname and a random suffix" do
+      driver = build_driver({}, kitchen_instance(name: "potatoes"))
+
+      expect(driver.default_name).to match(/\Apotatoes-user-host-[a-z0-9]{7}\z/)
     end
 
-    context "local node with a long hostname" do
-      let(:hostname) { "ab.c" * 20 }
+    it "is different on every call" do
+      driver = build_driver({})
 
-      it "limits the generated name to 63 characters" do
-        expect(driver.default_name.length).to be <= 63
+      expect(driver.default_name).not_to eq(driver.default_name)
+    end
+
+    it "falls back to a placeholder when there is no login name" do
+      allow(Etc).to receive(:getlogin).and_return(nil)
+      driver = build_driver({}, kitchen_instance(name: "potatoes"))
+
+      expect(driver.default_name).to match(/\Apotatoes-nologin-host-/)
+    end
+
+    context "with a long hostname" do
+      before { allow(Socket).to receive(:gethostname).and_return("ab.c" * 20) }
+
+      it "stays within the 63 character DNS label limit" do
+        expect(build_driver({}).default_name.length).to be <= described_class::MAX_SERVER_NAME_LENGTH
       end
     end
 
-    context "node with a long hostname, username, and base name" do
-      let(:login) { "abcd" * 20 }
-      let(:hostname) { "efgh" * 20 }
-      let(:instance_name) { "ijkl" * 20 }
+    context "with a long hostname, login and instance name" do
+      before do
+        allow(Etc).to receive(:getlogin).and_return("abcd" * 20)
+        allow(Socket).to receive(:gethostname).and_return("efgh" * 20)
+      end
 
-      it "limits the generated name to 63 characters" do
-        expect(driver.default_name.length).to eq(63)
+      it "uses the full 63 character budget" do
+        driver = build_driver({}, kitchen_instance(name: "ijkl" * 20))
+
+        expect(driver.default_name.length).to eq(described_class::MAX_SERVER_NAME_LENGTH)
       end
     end
 
-    context "a login and hostname with punctuation in them" do
-      let(:login) { "some.u-se-r" }
-      let(:hostname) { "a.host-name" }
-      let(:instance_name) { "a.instance-name" }
-
-      it "strips out the dots to prevent bad server names" do
-        expect(driver.default_name).to_not include(".")
+    context "with punctuation in the login, hostname and instance name" do
+      before do
+        allow(Etc).to receive(:getlogin).and_return("some.u-se-r")
+        allow(Socket).to receive(:gethostname).and_return("a.host-name")
       end
 
-      it "strips out all but the three hyphen separators" do
-        expect(driver.default_name.count("-")).to eq(3)
+      subject(:name) do
+        build_driver({}, kitchen_instance(name: "a.instance-name")).default_name
+      end
+
+      it "strips dots, which DigitalOcean rejects in Droplet names" do
+        expect(name).not_to include(".")
+      end
+
+      it "keeps only the three separators" do
+        expect(name.count("-")).to eq(3)
+      end
+    end
+
+    it "turns underscores into hyphens, which DigitalOcean does accept" do
+      driver = build_driver({}, kitchen_instance(name: "my_suite_name"))
+
+      expect(driver.default_name).to start_with("my-suite-name-")
+    end
+  end
+
+  describe "#create" do
+    before do
+      stub_droplet_create
+      stub_droplet_find(droplets: [droplet_payload])
+    end
+
+    it "records the Droplet ID in state" do
+      driver.create(state)
+
+      expect(state[:server_id]).to eq(1234)
+    end
+
+    it "records the public IPv4 address as the hostname" do
+      driver.create(state)
+
+      expect(state[:hostname]).to eq("1.2.3.4")
+    end
+
+    it "ignores the private address when picking a hostname" do
+      driver.create(state)
+
+      expect(state[:hostname]).not_to eq(DigitalOceanAPI::PRIVATE_NETWORK[:ip_address])
+    end
+
+    it "records the SSH username and port in state" do
+      build_driver(username: "admin", port: "2222").create(state)
+
+      expect(state).to include(username: "admin", port: "2222")
+    end
+
+    it "waits for the SSH transport to answer" do
+      expect(transport_connection).to receive(:wait_until_ready)
+
+      driver.create(state)
+    end
+
+    it "hands the populated state to the transport" do
+      expect(transport).to receive(:connection)
+        .with(hash_including(hostname: "1.2.3.4", username: "root", port: "22"))
+
+      driver.create(state)
+    end
+
+    it "logs that the instance was created" do
+      driver.create(state)
+
+      expect(log_output).to include("DigitalOcean instance <1234> created.")
+    end
+
+    describe "waiting for a public address" do
+      it "polls until the Droplet reports a public IPv4 address" do
+        stub_droplet_find(droplets: [
+          droplet_payload(status: "new", networks: :none),
+          droplet_payload(status: "active", networks: :private_only),
+          droplet_payload(status: "active", networks: :public),
+        ])
+
+        driver.create(state)
+
+        expect(a_request(:get, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")).to have_been_made.times(3)
+      end
+
+      it "does not re-fetch the Droplet once it has an address" do
+        driver.create(state)
+
+        expect(a_request(:get, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")).to have_been_made.once
+      end
+
+      it "tolerates a Droplet payload with no networks key at all" do
+        stub_droplet_find(droplets: [
+          droplet_payload(status: "new", networks: :absent),
+          droplet_payload(status: "active", networks: :public),
+        ])
+
+        expect { driver.create(state) }.not_to raise_error
+      end
+
+      it "gives up once the timeout elapses" do
+        stub_droplet_find(droplets: [droplet_payload(status: "new", networks: :none)])
+        driver = build_driver(server_wait_timeout: 0)
+
+        expect { driver.create(state) }
+          .to raise_error(Kitchen::ActionFailed, /Timed out after 0 seconds waiting for/)
+      end
+
+      it "leaves the Droplet ID in state when it times out, so destroy can clean up" do
+        stub_droplet_find(droplets: [droplet_payload(status: "new", networks: :none)])
+        driver = build_driver(server_wait_timeout: 0)
+
+        expect { driver.create(state) }.to raise_error(Kitchen::ActionFailed)
+        expect(state[:server_id]).to eq(1234)
+      end
+    end
+
+    describe "when the instance already exists" do
+      let(:state) { { server_id: 1234, hostname: "1.2.3.4" } }
+
+      it "does not create a second Droplet" do
+        driver.create(state)
+
+        expect(a_request(:post, "#{DigitalOceanAPI::API_ROOT}/v2/droplets")).not_to have_been_made
+      end
+
+      it "says so in the log" do
+        driver.create(state)
+
+        expect(log_output).to include("DigitalOcean instance <1234> already created.")
+      end
+    end
+
+    describe "pre_create_command" do
+      it "runs the configured command before provisioning" do
+        driver = build_driver(pre_create_command: "echo hello")
+        expect(driver).to receive(:run_command).with("echo hello")
+
+        driver.create(state)
+      end
+
+      it "turns a failing command into an ActionFailed" do
+        driver = build_driver(pre_create_command: "false")
+        allow(driver).to receive(:run_command).and_raise(Kitchen::ShellOut::ShellCommandFailed, "boom")
+
+        expect { driver.create(state) }.to raise_error(Kitchen::ActionFailed, /pre_create_command/)
+      end
+    end
+
+    describe "when the API rejects the request" do
+      it "raises a Test Kitchen error rather than leaking a droplet_kit backtrace" do
+        stub_request(:post, "#{DigitalOceanAPI::API_ROOT}/v2/droplets")
+          .to_return(status: 401, body: error_payload("unauthorized", "Unable to authenticate you."),
+                     headers: DigitalOceanAPI::JSON_HEADERS)
+
+        expect { driver.create(state) }
+          .to raise_error(Kitchen::ActionFailed, /401.*Unable to authenticate you/m)
+      end
+
+      it "does not record a server ID" do
+        stub_request(:post, "#{DigitalOceanAPI::API_ROOT}/v2/droplets")
+          .to_return(status: 422, body: error_payload("unprocessable_entity", "invalid size"),
+                     headers: DigitalOceanAPI::JSON_HEADERS)
+
+        expect { driver.create(state) }.to raise_error(Kitchen::ActionFailed)
+        expect(state).to be_empty
+      end
+
+      it "raises a clear error when the API returns an unexpected success status" do
+        stub_droplet_create(status: 200)
+
+        expect { driver.create(state) }
+          .to raise_error(Kitchen::ActionFailed, /unexpected response.*access token/m)
+      end
+
+      it "raises a Test Kitchen error when the Droplet lookup fails" do
+        stub_request(:get, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")
+          .to_return(status: 500, body: error_payload("server_error", "oops"),
+                     headers: DigitalOceanAPI::JSON_HEADERS)
+
+        expect { driver.create(state) }.to raise_error(Kitchen::ActionFailed, /500/)
       end
     end
   end
-end
 
-# vim: ai et ts=2 sts=2 sw=2 ft=ruby
+  describe "the Droplet create request" do
+    subject(:body) do
+      driver.create(state)
+      request_body(created_droplet_request)
+    end
+
+    before do
+      stub_droplet_create
+      stub_droplet_find(droplets: [droplet_payload])
+    end
+
+    it "sends the configured server name" do
+      driver = build_driver(server_name: "hello")
+      driver.create(state)
+
+      expect(request_body(created_droplet_request)).to include(name: "hello")
+    end
+
+    it "sends the region, image and size" do
+      driver = build_driver(region: "nyc3", image: "debian-13-x64", size: "s-2vcpu-4gb")
+      driver.create(state)
+
+      expect(request_body(created_droplet_request))
+        .to include(region: "nyc3", image: "debian-13-x64", size: "s-2vcpu-4gb")
+    end
+
+    it "sends the monitoring, ipv6 and private networking flags" do
+      driver = build_driver(monitoring: true, ipv6: true, private_networking: false)
+      driver.create(state)
+
+      expect(request_body(created_droplet_request))
+        .to include(monitoring: true, ipv6: true, private_networking: false)
+    end
+
+    it "sends user data verbatim" do
+      driver = build_driver(user_data: "#cloud-config\npackages: [git]\n")
+      driver.create(state)
+
+      expect(request_body(created_droplet_request)).to include(user_data: "#cloud-config\npackages: [git]\n")
+    end
+
+    it "sends the VPC UUID" do
+      driver = build_driver(vpcs: "3a92ae2d-f1b7-4589-81b8-8ef144374453")
+      driver.create(state)
+
+      expect(request_body(created_droplet_request))
+        .to include(vpc_uuid: "3a92ae2d-f1b7-4589-81b8-8ef144374453")
+    end
+
+    describe "ssh_keys" do
+      {
+        "a single ID" => ["1234", %w{1234}],
+        "a comma separated list" => ["1234,5678", %w{1234 5678}],
+        "a comma and space separated list" => ["1234, 5678", %w{1234 5678}],
+        "a space separated list" => ["1234 5678", %w{1234 5678}],
+        "a YAML array" => [%w{1234 5678}, %w{1234 5678}],
+        "an array of integers" => [[1234, 5678], %w{1234 5678}],
+        "a bare integer" => [1234, %w{1234}],
+        "a fingerprint" => ["aa:bb:cc", %w{aa:bb:cc}],
+      }.each do |description, (configured, expected)|
+        it "sends #{description} as #{expected.inspect}" do
+          build_driver(ssh_key_ids: configured).create(state)
+
+          expect(request_body(created_droplet_request)).to include(ssh_keys: expected)
+        end
+      end
+    end
+
+    describe "tags" do
+      {
+        "a single tag" => ["web", %w{web}],
+        "a comma separated list" => ["web,db", %w{web db}],
+        "a comma and space separated list" => ["web, db", %w{web db}],
+        "a space separated list" => ["web db", %w{web db}],
+        "a YAML array" => [%w{web db}, %w{web db}],
+        "no tags" => [nil, []],
+      }.each do |description, (configured, expected)|
+        it "sends #{description} as #{expected.inspect}" do
+          build_driver(tags: configured).create(state)
+
+          expect(request_body(created_droplet_request)).to include(tags: expected)
+        end
+      end
+    end
+
+    def created_droplet_request
+      request = nil
+      WebMock::RequestRegistry.instance.requested_signatures.each do |signature, _count|
+        request = signature if signature.method == :post && signature.uri.path == "/v2/droplets"
+      end
+      request
+    end
+  end
+
+  describe "firewalls" do
+    before do
+      stub_droplet_create
+      stub_droplet_find(droplets: [droplet_payload])
+    end
+
+    it "makes no firewall calls when none are configured" do
+      driver.create(state)
+
+      expect(WebMock).not_to have_requested(:get, %r{/v2/firewalls/})
+    end
+
+    it "attaches the Droplet to a firewall given by ID" do
+      stub_firewall_find(id: "fw-1")
+      stub_firewall_add_droplets(id: "fw-1")
+
+      build_driver(firewalls: "fw-1").create(state)
+
+      expect(WebMock).to have_requested(:post, "#{DigitalOceanAPI::API_ROOT}/v2/firewalls/fw-1/droplets")
+        .with(body: { droplet_ids: [1234] }.to_json)
+    end
+
+    %w{fw-1,fw-2 fw-1,\ fw-2}.each do |configured|
+      it "attaches to every firewall in #{configured.inspect}" do
+        %w{fw-1 fw-2}.each do |id|
+          stub_firewall_find(id: id)
+          stub_firewall_add_droplets(id: id)
+        end
+
+        build_driver(firewalls: configured).create(state)
+
+        %w{fw-1 fw-2}.each do |id|
+          expect(WebMock).to have_requested(:post, "#{DigitalOceanAPI::API_ROOT}/v2/firewalls/#{id}/droplets")
+        end
+      end
+    end
+
+    it "accepts a YAML array of firewall IDs" do
+      %w{fw-1 fw-2}.each do |id|
+        stub_firewall_find(id: id)
+        stub_firewall_add_droplets(id: id)
+      end
+
+      build_driver(firewalls: %w{fw-1 fw-2}).create(state)
+
+      expect(WebMock).to have_requested(:post, "#{DigitalOceanAPI::API_ROOT}/v2/firewalls/fw-2/droplets")
+    end
+
+    it "warns and carries on when a firewall does not exist" do
+      stub_firewall_missing(id: "nope")
+
+      build_driver(firewalls: "nope").create(state)
+
+      expect(log_output).to include("firewalls id: 'nope' was not found in api, ignoring")
+      expect(state[:hostname]).to eq("1.2.3.4")
+    end
+
+    it "warns and carries on when the firewalls setting is not a list" do
+      build_driver(firewalls: { id: "fw-1" }).create(state)
+
+      expect(log_output).to include("firewalls attribute is not a String or Array, ignoring")
+      expect(state[:hostname]).to eq("1.2.3.4")
+    end
+
+    it "raises a Test Kitchen error when attaching the firewall fails" do
+      stub_firewall_find(id: "fw-1")
+      stub_request(:post, "#{DigitalOceanAPI::API_ROOT}/v2/firewalls/fw-1/droplets")
+        .to_return(status: 422, body: error_payload("unprocessable_entity", "nope"),
+                   headers: DigitalOceanAPI::JSON_HEADERS)
+
+      expect { build_driver(firewalls: "fw-1").create(state) }
+        .to raise_error(Kitchen::ActionFailed, /422/)
+    end
+  end
+
+  describe "#destroy" do
+    let(:state) { { server_id: 1234, hostname: "1.2.3.4" } }
+
+    it "does nothing without a server ID" do
+      driver.destroy({})
+
+      expect(WebMock).not_to have_requested(:any, %r{api\.digitalocean\.com})
+    end
+
+    it "deletes an active Droplet" do
+      stub_droplet_find(droplets: [droplet_payload(status: "active")])
+      stub_droplet_delete
+
+      driver.destroy(state)
+
+      expect(WebMock).to have_requested(:delete, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")
+    end
+
+    it "clears the server ID and hostname from state" do
+      stub_droplet_find(droplets: [droplet_payload(status: "active")])
+      stub_droplet_delete
+
+      driver.destroy(state)
+
+      expect(state).to be_empty
+    end
+
+    it "logs the destruction" do
+      stub_droplet_find(droplets: [droplet_payload(status: "active")])
+      stub_droplet_delete
+
+      driver.destroy(state)
+
+      expect(log_output).to include("DigitalOcean instance <1234> destroyed.")
+    end
+
+    it "waits for a Droplet that is still in the new status" do
+      stub_droplet_find(droplets: [
+        droplet_payload(status: "new"),
+        droplet_payload(status: "new"),
+        droplet_payload(status: "active"),
+      ])
+      stub_droplet_delete
+
+      driver.destroy(state)
+
+      expect(a_request(:get, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")).to have_been_made.times(3)
+      expect(WebMock).to have_requested(:delete, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")
+    end
+
+    it "gives up on a Droplet that never leaves the new status" do
+      stub_droplet_find(droplets: [droplet_payload(status: "new")])
+      driver = build_driver(server_wait_timeout: 0)
+
+      expect { driver.destroy(state) }
+        .to raise_error(Kitchen::ActionFailed, /Timed out .* waiting for .* to become active/)
+    end
+
+    it "keeps the state intact when it gives up, so destroy can be retried" do
+      stub_droplet_find(droplets: [droplet_payload(status: "new")])
+      driver = build_driver(server_wait_timeout: 0)
+
+      expect { driver.destroy(state) }.to raise_error(Kitchen::ActionFailed)
+      expect(state[:server_id]).to eq(1234)
+    end
+
+    describe "when the Droplet is already gone" do
+      before { stub_droplet_missing }
+
+      it "does not attempt a delete" do
+        driver.destroy(state)
+
+        expect(WebMock).not_to have_requested(:delete, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")
+      end
+
+      it "still clears the state" do
+        driver.destroy(state)
+
+        expect(state).to be_empty
+      end
+
+      it "says so in the log" do
+        driver.destroy(state)
+
+        expect(log_output).to include("DigitalOcean instance <1234> is already gone.")
+      end
+    end
+
+    it "raises a Test Kitchen error when the lookup fails for another reason" do
+      stub_request(:get, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")
+        .to_return(status: 401, body: error_payload("unauthorized", "Unable to authenticate you."),
+                   headers: DigitalOceanAPI::JSON_HEADERS)
+
+      expect { driver.destroy(state) }.to raise_error(Kitchen::ActionFailed, /401/)
+    end
+
+    it "raises a Test Kitchen error when the delete fails" do
+      stub_droplet_find(droplets: [droplet_payload(status: "active")])
+      stub_request(:delete, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")
+        .to_return(status: 403, body: error_payload("forbidden", "nope"),
+                   headers: DigitalOceanAPI::JSON_HEADERS)
+
+      expect { driver.destroy(state) }.to raise_error(Kitchen::ActionFailed, /403/)
+      expect(state[:server_id]).to eq(1234)
+    end
+  end
+
+  describe "the API client" do
+    it "is built once and reused across calls" do
+      expect(DropletKit::Client).to receive(:new).once.and_call_original
+
+      stub_droplet_create
+      stub_droplet_find(droplets: [droplet_payload])
+      driver.create(state)
+    end
+
+    it "is pointed at the configured API URL" do
+      stub_request(:post, "https://api.example.test/v2/droplets")
+        .to_return(status: 202, body: { droplet: droplet_payload }.to_json,
+                   headers: DigitalOceanAPI::JSON_HEADERS)
+      stub_request(:get, "https://api.example.test/v2/droplets/1234")
+        .to_return(status: 200, body: { droplet: droplet_payload }.to_json,
+                   headers: DigitalOceanAPI::JSON_HEADERS)
+
+      build_driver(api_url: "https://api.example.test").create(state)
+
+      expect(WebMock).to have_requested(:post, "https://api.example.test/v2/droplets")
+    end
+
+    it "authenticates with the configured access token" do
+      stub_droplet_create
+      stub_droplet_find(droplets: [droplet_payload])
+
+      build_driver(digitalocean_access_token: "secret-token").create(state)
+
+      expect(WebMock).to have_requested(:post, "#{DigitalOceanAPI::API_ROOT}/v2/droplets")
+        .with(headers: { "Authorization" => "Bearer secret-token" })
+    end
+
+    describe "debug logging" do
+      before do
+        stub_droplet_create
+        stub_droplet_find(droplets: [droplet_payload])
+      end
+
+      it "never writes the access token to the log" do
+        build_driver(digitalocean_access_token: "super-secret-token").create(state)
+
+        expect(log_output).not_to include("super-secret-token")
+      end
+
+      it "logs a redacted token so the right account can still be identified" do
+        build_driver(digitalocean_access_token: "super-secret-token").create(state)
+
+        expect(log_output).to match(/digitalocean:access_token \*+oken/)
+      end
+
+      it "does not blow up when the token is short" do
+        build_driver(digitalocean_access_token: "abc").create(state)
+
+        expect(log_output).to include("digitalocean:access_token ***")
+      end
+
+      it "logs the resolved Droplet configuration" do
+        build_driver(size: "s-2vcpu-4gb").create(state)
+
+        expect(log_output).to include("digitalocean:size s-2vcpu-4gb")
+      end
+
+      it "puts a space between the image label and its value" do
+        build_driver(image: "debian-13-x64").create(state)
+
+        expect(log_output).to include("digitalocean:image debian-13-x64")
+      end
+    end
+  end
+
+  describe "#normalize_list" do
+    subject(:normalize) { ->(value) { driver.send(:normalize_list, value) } }
+
+    it "treats nil as an empty list" do
+      expect(normalize.call(nil)).to eq([])
+    end
+
+    it "splits on commas" do
+      expect(normalize.call("a,b,c")).to eq(%w{a b c})
+    end
+
+    it "splits on commas with surrounding whitespace" do
+      expect(normalize.call("a , b ,c")).to eq(%w{a b c})
+    end
+
+    it "splits on whitespace" do
+      expect(normalize.call("a b\tc")).to eq(%w{a b c})
+    end
+
+    it "drops empty entries produced by trailing separators" do
+      expect(normalize.call("a,,b,")).to eq(%w{a b})
+    end
+
+    it "ignores leading and trailing whitespace" do
+      expect(normalize.call("  a, b  ")).to eq(%w{a b})
+    end
+
+    it "stringifies array members" do
+      expect(normalize.call([1, :two, "three"])).to eq(%w{1 two three})
+    end
+
+    it "drops blank array members" do
+      expect(normalize.call(["a", "", "  "])).to eq(%w{a})
+    end
+
+    it "wraps a bare number" do
+      expect(normalize.call(42)).to eq(%w{42})
+    end
+
+    it "returns nil for a type that cannot be read as a list" do
+      expect(normalize.call({ a: 1 })).to be_nil
+    end
+  end
+
+  # Builds a driver with no configuration of its own, so the `default_config`
+  # blocks that read ENV are the only source of values.
+  def build_driver_without_defaults
+    Kitchen::Driver::Digitalocean.new({}).finalize_config!(kitchen_instance)
+  end
+end

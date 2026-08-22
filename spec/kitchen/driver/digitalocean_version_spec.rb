@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 #
-# Author:: Greg Fitzgerald (<greg@gregf.org>)
-#
-# Copyright (C) 2013, Greg Fitzgerald
-#
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -17,17 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-module Kitchen
-  # Namespace for Test Kitchen driver plugins.
-  module Driver
-    # Version of the kitchen-digitalocean gem.
-    #
-    # Kept in its own file so the gemspec can read it without loading the
-    # driver, and so `release-please` has a single line to bump.
-    #
-    # @return [String] a semantic version string
-    DIGITALOCEAN_VERSION = "0.16.2"
+require "spec_helper"
+
+RSpec.describe "Kitchen::Driver::DIGITALOCEAN_VERSION" do
+  subject(:version) { Kitchen::Driver::DIGITALOCEAN_VERSION }
+
+  it "is a semantic version string" do
+    expect(version).to match(/\A\d+\.\d+\.\d+\z/)
+  end
+
+  it "can be parsed by RubyGems" do
+    expect { Gem::Version.new(version) }.not_to raise_error
+  end
+
+  it "matches the version release-please tracks" do
+    manifest = JSON.parse(File.read(File.expand_path("../../../.release-please-manifest.json", __dir__)))
+
+    expect(manifest["."]).to eq(version)
   end
 end
-
-# vim: ai et ts=2 sts=2 sw=2 ft=ruby

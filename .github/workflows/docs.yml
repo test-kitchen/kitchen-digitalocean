@@ -1,0 +1,32 @@
+---
+name: "Docs"
+
+"on":
+  pull_request:
+  push:
+    branches: [main]
+
+# Documentation is informational only. This job never blocks a pull request:
+# every step is allowed to fail so a missing YARD tag cannot turn CI red.
+jobs:
+  yard:
+    name: YARD documentation coverage
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+
+      - name: Build the documentation
+        continue-on-error: true
+        run: bundle exec rake yard
+
+      - name: Report undocumented objects
+        continue-on-error: true
+        run: bundle exec yard stats --list-undoc

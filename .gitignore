@@ -18,3 +18,4 @@ tmp
 .kitchen
 *.sw?
 *~
+.rspec_status
