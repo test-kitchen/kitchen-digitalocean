@@ -35,7 +35,8 @@ describe Kitchen::Driver::Digitalocean do
       name: instance_name,
       logger: logger,
       to_str: "instance",
-      platform: double(name: platform_name)
+      platform: double(name: platform_name),
+      transport: double(connection: true)
     )
   end
 
@@ -138,7 +139,6 @@ describe Kitchen::Driver::Digitalocean do
       {
         default_name: "a_monkey!",
         create_server: server,
-        wait_for_sshd: "1.2.3.4",
       }.each do |k, v|
         allow_any_instance_of(described_class).to receive(k).and_return(v)
       end
