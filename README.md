@@ -64,4 +64,4 @@ Created and maintained by [Greg Fitzgerald](https://github.com/gregf/) (<greg@gr
 
 ## License
 
-Apache 2.0 (see [LICENSE](https://github.com/test-kitchen/kitchen-digitalocean/blob/master/LICENSE.txt))
+Apache 2.0 (see [LICENSE](https://github.com/test-kitchen/kitchen-digitalocean/blob/main/LICENSE))
