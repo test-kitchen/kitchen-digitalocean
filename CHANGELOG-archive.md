@@ -82,7 +82,7 @@ Archive of changelog entries pre-please-release.
 
 ## 0.9.7 / 2017-09-09
 
-- Update slug abbrevations
+- Update slug abbreviations
 - Bump a few testing tools in the gemspec file
 - Fix some rubocop warnings
 - Fix tests
