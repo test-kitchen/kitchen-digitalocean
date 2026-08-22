@@ -1,4 +1,3 @@
-
 # Kitchen::Digitalocean
 
 [![Gem Version](https://badge.fury.io/rb/kitchen-digitalocean.svg)](http://badge.fury.io/rb/kitchen-digitalocean)
