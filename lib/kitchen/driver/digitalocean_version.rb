@@ -26,7 +26,7 @@ module Kitchen
     # driver, and so `release-please` has a single line to bump.
     #
     # @return [String] a semantic version string
-    DIGITALOCEAN_VERSION = "0.16.2"
+    DIGITALOCEAN_VERSION = "0.17.0"
   end
 end
 
