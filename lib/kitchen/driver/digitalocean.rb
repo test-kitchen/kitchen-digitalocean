@@ -21,6 +21,8 @@ require "droplet_kit" unless defined?(DropletKit)
 require "kitchen"
 require "etc" unless defined?(Etc)
 require "socket" unless defined?(Socket)
+require "time" unless defined?(Time.now.iso8601)
+require_relative "digitalocean_version"
 
 module Kitchen
   # Namespace for Test Kitchen driver plugins.
@@ -42,6 +44,13 @@ module Kitchen
     # @see https://docs.digitalocean.com/reference/api/api-reference/ DigitalOcean API reference
     # @author Greg Fitzgerald <greg@gregf.org>
     class Digitalocean < Kitchen::Driver::Base
+      kitchen_driver_api_version 2
+
+      plugin_version Kitchen::Driver::DIGITALOCEAN_VERSION
+
+      # Droplet statuses DigitalOcean reports for a Droplet that is running.
+      LIVE_STATUSES = %w{active}.freeze
+
       # Maps short, human friendly Test Kitchen platform names onto the
       # DigitalOcean image slugs they correspond to.
       #
@@ -237,7 +246,71 @@ module Kitchen
         ].join("-").tr("_", "-")[0, MAX_SERVER_NAME_LENGTH]
       end
 
+      # Reports what DigitalOcean currently thinks of the Droplet.
+      #
+      # @param state [Hash] instance state naming the Droplet
+      # @return [Hash] a Test Kitchen status hash, or the base implementation's
+      #   answer when there is no Droplet or DigitalOcean does not know it
+      def status(state)
+        return super unless state[:server_id]
+
+        droplet = lookup_droplet(state[:server_id])
+        return super unless droplet
+
+        {
+          live: LIVE_STATUSES.include?(droplet.status),
+          state: droplet.status,
+          source: "driver",
+          resource_id: state[:server_id].to_s,
+          message: "DigitalOcean reports the Droplet as #{droplet.status}",
+          checked_at: Time.now.utc.iso8601,
+        }
+      end
+
+      # Checks the configuration for the mistakes that otherwise surface part
+      # way through +create+, once a Droplet may already be running.
+      #
+      # @param state [Hash] mutable instance and driver state
+      # @return [Boolean] true when a problem was reported
+      def doctor(state) # rubocop:disable Lint/UnusedMethodArgument
+        problems = token_problems
+
+        if Array(config[:ssh_key_ids]).empty?
+          problems << "ssh_key_ids is set but empty, so the Droplet would be " \
+                      "built with no key installed and the transport could " \
+                      "not log in."
+        end
+
+        problems.each { |problem| warn(problem) }
+        !problems.empty?
+      end
+
       private
+
+      # Confirms the configured token is actually accepted, which is cheaper to
+      # learn here than after a Droplet has been billed for.
+      #
+      # @return [Array<String>] a problem description, or an empty array
+      def token_problems
+        client.account.info
+        []
+      # ::StandardError, not StandardError: Kitchen defines its own
+      # Kitchen::StandardError, which wins lexical constant lookup in here and
+      # would narrow this rescue to Test Kitchen's own errors.
+      rescue ::StandardError => e
+        ["DigitalOcean rejected the configured access token: #{e.message}"]
+      end
+
+      # Looks a Droplet up without turning an unreachable API into a failure.
+      #
+      # @param server_id [String, Integer] ID of the Droplet to fetch
+      # @return [DropletKit::Droplet, nil] the Droplet, or nil when it is gone
+      #   or DigitalOcean cannot be reached
+      def lookup_droplet(server_id)
+        find_droplet(server_id)
+      rescue Kitchen::ActionFailed
+        nil
+      end
 
       # Memoized DigitalOcean API client.
       #
