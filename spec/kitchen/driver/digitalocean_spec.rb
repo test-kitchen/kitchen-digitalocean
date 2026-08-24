@@ -34,6 +34,87 @@ RSpec.describe Kitchen::Driver::Digitalocean do
     end
   end
 
+  describe "plugin metadata" do
+    it "declares the driver API version" do
+      expect(described_class.instance_variable_get(:@api_version)).to eq(2)
+    end
+
+    it "reports its own gem version to kitchen diagnose" do
+      expect(driver.diagnose_plugin[:version])
+        .to eq(Kitchen::Driver::DIGITALOCEAN_VERSION)
+    end
+  end
+
+  describe "#status" do
+    let(:droplet) { instance_double(DropletKit::Droplet, status: "active") }
+
+    it "reports an unknown status with no droplet in state" do
+      expect(driver.status({})).to include(live: nil, state: "unknown")
+    end
+
+    it "reports an unknown status when the droplet is gone" do
+      allow(driver).to receive(:find_droplet).with(42).and_return(nil)
+
+      expect(driver.status(server_id: 42)).to include(state: "unknown")
+    end
+
+    it "reports a running droplet as live" do
+      allow(driver).to receive(:find_droplet).with(42).and_return(droplet)
+
+      expect(driver.status(server_id: 42)).to include(
+        live: true, state: "active", source: "driver", resource_id: "42"
+      )
+    end
+
+    it "reports a powered off droplet as not live" do
+      allow(driver).to receive(:find_droplet)
+        .and_return(instance_double(DropletKit::Droplet, status: "off"))
+
+      expect(driver.status(server_id: 42)).to include(live: false, state: "off")
+    end
+
+    it "stamps when the check happened" do
+      allow(driver).to receive(:find_droplet).and_return(droplet)
+
+      expect(driver.status(server_id: 42)[:checked_at])
+        .to match(/\A\d{4}-\d{2}-\d{2}T/)
+    end
+
+    it "reports an unknown status when the API cannot be reached" do
+      allow(driver).to receive(:find_droplet)
+        .and_raise(Kitchen::ActionFailed.new("boom"))
+
+      expect(driver.status(server_id: 42)).to include(state: "unknown")
+    end
+  end
+
+  describe "#doctor" do
+    before do
+      allow(driver).to receive(:client)
+        .and_return(double(account: double(info: true)))
+    end
+
+    it "reports no problem when the configuration is complete" do
+      expect(driver.doctor(state)).to be(false)
+    end
+
+    it "reports an empty ssh_key_ids" do
+      d = build_driver(ssh_key_ids: [])
+      allow(d).to receive(:client)
+        .and_return(double(account: double(info: true)))
+
+      expect(d.doctor(state)).to be(true)
+      expect(logged_output.string).to match(/ssh_key_ids is set but empty/)
+    end
+
+    it "reports a token DigitalOcean rejects" do
+      allow(driver).to receive(:client).and_raise(StandardError.new("401"))
+
+      expect(driver.doctor(state)).to be(true)
+      expect(logged_output.string).to match(/rejected the configured access token/)
+    end
+  end
+
   describe "configuration defaults" do
     {
       username: "root",
