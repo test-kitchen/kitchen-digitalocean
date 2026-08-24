@@ -29,5 +29,5 @@ Gem::Specification.new do |spec|
   }
 
   spec.add_dependency "droplet_kit", ">= 3.7", "< 4.0"
-  spec.add_dependency "test-kitchen", ">= 1.17", "< 5"
+  spec.add_dependency "test-kitchen", ">= 3.0", "< 5"
 end
