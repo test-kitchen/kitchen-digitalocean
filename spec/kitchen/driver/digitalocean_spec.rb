@@ -80,6 +80,27 @@ RSpec.describe Kitchen::Driver::Digitalocean do
         .to match(/\A\d{4}-\d{2}-\d{2}T/)
     end
 
+    it "says why the status is unknown when state names no Droplet" do
+      expect(driver.status({}))
+        .to include(message: /no Droplet recorded/, resource_id: nil, source: "driver")
+    end
+
+    it "names the Droplet DigitalOcean does not know" do
+      allow(driver).to receive(:find_droplet).with(42).and_return(nil)
+
+      expect(driver.status(server_id: 42)[:message]).to match(/does not know a Droplet <42>/)
+    end
+
+    # Kitchen::Driver::Base only grew #status in test-kitchen 4.1, and the
+    # gemspec supports 3.0 upwards, so delegating with `super` was a
+    # NoMethodError waiting for anyone on an older release.
+    it "does not delegate to Kitchen::Driver::Base#status" do
+      expect(driver).not_to receive(:method_missing)
+
+      expect { driver.status({}) }.not_to raise_error
+      expect(driver.status({})[:message]).not_to match(/does not support status checks/)
+    end
+
     it "reports an unknown status when the API cannot be reached" do
       allow(driver).to receive(:find_droplet)
         .and_raise(Kitchen::ActionFailed.new("boom"))
@@ -105,6 +126,20 @@ RSpec.describe Kitchen::Driver::Digitalocean do
 
       expect(d.doctor(state)).to be(true)
       expect(logged_output.string).to match(/ssh_key_ids is set but empty/)
+    end
+
+    # Array("  ") is ["  "] and Array(",") is [","], so the old check passed
+    # both while create_server sent no keys at all. The Droplet then came up
+    # with a mailed root password and no way for the transport to log in --
+    # exactly what doctor exists to catch first.
+    ["  ", ",", " , "].each do |value|
+      it "reports ssh_key_ids of #{value.inspect}, which sends no keys at all" do
+        d = build_driver(ssh_key_ids: value)
+        allow(d).to receive(:client).and_return(double(account: double(info: true)))
+
+        expect(d.doctor(state)).to be(true)
+        expect(logged_output.string).to match(/ssh_key_ids is set but empty/)
+      end
     end
 
     it "reports a token DigitalOcean rejects" do
@@ -555,12 +590,55 @@ RSpec.describe Kitchen::Driver::Digitalocean do
       expect(request_body(created_droplet_request)).to include(user_data: "#cloud-config\npackages: [git]\n")
     end
 
+    describe "vpcs" do
+      # The setting is plural and every other list shaped setting here takes a
+      # YAML list, so people write one. Sending the array straight through as
+      # vpc_uuid earned an opaque 422.
+      it "accepts a YAML list, which the plural name invites" do
+        build_driver(vpcs: ["3a92ae2d-f1b7-4589-81b8-8ef144374453"]).create(state)
+
+        expect(request_body(created_droplet_request)[:vpc_uuid]).to eq("3a92ae2d-f1b7-4589-81b8-8ef144374453")
+      end
+
+      it "uses the first of several and says so" do
+        build_driver(vpcs: %w{first-uuid second-uuid}).create(state)
+
+        expect(request_body(created_droplet_request)[:vpc_uuid]).to eq("first-uuid")
+        expect(log_output).to include("Using first-uuid and ignoring the rest")
+      end
+
+      it "sends nothing when none is configured" do
+        driver.create(state)
+
+        expect(request_body(created_droplet_request)[:vpc_uuid]).to be_nil
+      end
+    end
+
     it "sends the VPC UUID" do
       driver = build_driver(vpcs: "3a92ae2d-f1b7-4589-81b8-8ef144374453")
       driver.create(state)
 
       expect(request_body(created_droplet_request))
         .to include(vpc_uuid: "3a92ae2d-f1b7-4589-81b8-8ef144374453")
+    end
+
+    # normalize_list answers nil for a value it cannot read, and that nil used
+    # to go straight into the request body as `"tags": null`, which
+    # DigitalOcean accepts and silently ignores.
+    describe "a setting of a type that cannot be read as a list" do
+      it "warns about tags rather than sending null" do
+        build_driver(tags: { env: "prod" }).create(state)
+
+        expect(log_output).to include("tags attribute is not a String or Array, ignoring")
+        expect(request_body(created_droplet_request)[:tags]).to eq([])
+      end
+
+      it "warns about ssh_key_ids rather than sending null" do
+        build_driver(ssh_key_ids: { id: 1 }).create(state)
+
+        expect(log_output).to include("ssh_key_ids attribute is not a String or Array, ignoring")
+        expect(request_body(created_droplet_request)[:ssh_keys]).to eq([])
+      end
     end
 
     describe "ssh_keys" do
@@ -779,6 +857,30 @@ RSpec.describe Kitchen::Driver::Digitalocean do
       expect { driver.destroy(state) }.to raise_error(Kitchen::ActionFailed, /401/)
     end
 
+    # The poll above the delete leaves a window in which someone -- a colleague,
+    # a cleanup script, the control panel -- can remove the Droplet first. That
+    # used to raise, leaving :server_id in state and every later
+    # `kitchen destroy` failing the same way against a Droplet that was
+    # already gone.
+    describe "when the Droplet disappears between the poll and the delete" do
+      before do
+        stub_droplet_find(droplets: [droplet_payload(status: "active")])
+        stub_request(:delete, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")
+          .to_return(status: 404, body: error_payload("not_found", "gone"),
+                     headers: DigitalOceanAPI::JSON_HEADERS)
+      end
+
+      it "does not fail" do
+        expect { driver.destroy(state) }.not_to raise_error
+      end
+
+      it "clears the state, so destroy is not stuck failing forever" do
+        driver.destroy(state)
+
+        expect(state).not_to include(:server_id, :hostname)
+      end
+    end
+
     it "raises a Test Kitchen error when the delete fails" do
       stub_droplet_find(droplets: [droplet_payload(status: "active")])
       stub_request(:delete, "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234")
@@ -856,6 +958,144 @@ RSpec.describe Kitchen::Driver::Digitalocean do
         build_driver(image: "debian-13-x64").create(state)
 
         expect(log_output).to include("digitalocean:image debian-13-x64")
+      end
+    end
+  end
+
+  # The unit suite otherwise describes an API that always answers, and answers
+  # promptly. The live one does neither: DigitalOcean allows 250 requests a
+  # minute and a `kitchen test` across a dozen platforms polls hard enough to
+  # meet that, and a poll loop that can run for ten minutes will eventually
+  # meet a reset connection. Both used to end the run with a Droplet already
+  # created and billing.
+  describe "transient API failures" do
+    let(:droplet_url) { "#{DigitalOceanAPI::API_ROOT}/v2/droplets/1234" }
+
+    before { allow(driver).to receive(:sleep) }
+
+    describe "a rate limited request" do
+      it "is retried rather than failing the run" do
+        stub_droplet_create
+        stub_request(:get, droplet_url)
+          .to_return(rate_limited_response, droplet_response)
+
+        driver.create(state)
+
+        expect(state[:hostname]).to eq("1.2.3.4")
+      end
+
+      it "waits as long as DigitalOcean says the window has left" do
+        stub_droplet_create
+        stub_request(:get, droplet_url)
+          .to_return(rate_limited_response(reset_in: 12), droplet_response)
+
+        driver.create(state)
+
+        # Rounding up a partial second, so 12 or 13.
+        expect(driver).to have_received(:sleep).with(a_value_between(12, 13))
+      end
+
+      it "never waits longer than a minute, however far off the window is" do
+        stub_droplet_create
+        stub_request(:get, droplet_url)
+          .to_return(rate_limited_response(reset_in: 3600), droplet_response)
+
+        driver.create(state)
+
+        expect(driver).to have_received(:sleep).with(60)
+      end
+
+      it "falls back to a fixed pause when there is no reset header" do
+        stub_droplet_create
+        stub_request(:get, droplet_url).to_return(
+          { status: 429, body: error_payload("too_many_requests", "slow down"),
+            headers: DigitalOceanAPI::JSON_HEADERS },
+          droplet_response
+        )
+
+        driver.create(state)
+
+        expect(driver).to have_received(:sleep).with(60)
+      end
+
+      it "gives up once the retries are exhausted" do
+        stub_droplet_create
+        stub_request(:get, droplet_url).to_return(rate_limited_response)
+
+        expect { driver.create(state) }
+          .to raise_error(Kitchen::ActionFailed, /rate limit was still in force/)
+      end
+
+      it "is retried on a create too, which a 429 guarantees did not happen" do
+        stub_request(:post, "#{DigitalOceanAPI::API_ROOT}/v2/droplets")
+          .to_return(
+            rate_limited_response,
+            { status: 202,
+              body: { droplet: droplet_payload(status: "new", networks: :none) }.to_json,
+              headers: DigitalOceanAPI::JSON_HEADERS }
+          )
+        stub_droplet_find(droplets: [droplet_payload])
+
+        driver.create(state)
+
+        expect(state[:server_id]).to eq(1234)
+      end
+    end
+
+    describe "a connection that drops" do
+      it "is retried on a lookup, which is safe to repeat" do
+        stub_droplet_create
+        stub_request(:get, droplet_url)
+          .to_raise(Errno::ECONNRESET).then
+          .to_return(droplet_response)
+
+        driver.create(state)
+
+        expect(state[:hostname]).to eq("1.2.3.4")
+      end
+
+      it "backs off between attempts" do
+        stub_droplet_create
+        stub_request(:get, droplet_url)
+          .to_raise(Errno::ECONNRESET).then
+          .to_raise(Errno::ECONNRESET).then
+          .to_return(droplet_response)
+
+        driver.create(state)
+
+        expect(driver).to have_received(:sleep).with(2).ordered
+        expect(driver).to have_received(:sleep).with(4).ordered
+      end
+
+      it "gives up once the retries are exhausted" do
+        stub_droplet_create
+        stub_request(:get, droplet_url).to_raise(Errno::ECONNRESET)
+
+        expect { driver.create(state) }
+          .to raise_error(Kitchen::ActionFailed, /could not be reached after 5 retries/)
+      end
+
+      # A dropped connection says nothing about whether the request arrived.
+      # Retrying a create that did arrive bills for a second Droplet that Test
+      # Kitchen has no record of and will never destroy.
+      it "is not retried on a create" do
+        stub_request(:post, "#{DigitalOceanAPI::API_ROOT}/v2/droplets")
+          .to_raise(Errno::ECONNRESET)
+
+        expect { driver.create(state) }
+          .to raise_error(Kitchen::ActionFailed, /may still have been delivered/)
+
+        expect(WebMock).to have_requested(:post, "#{DigitalOceanAPI::API_ROOT}/v2/droplets").once
+      end
+
+      it "is reported as unreachable rather than as a rejected token" do
+        d = build_driver
+        stub_request(:get, "#{DigitalOceanAPI::API_ROOT}/v2/account")
+          .to_raise(Errno::ECONNRESET)
+
+        expect(d.doctor(state)).to be(true)
+        expect(logged_output.string).to match(/Could not reach the DigitalOcean API/)
+        expect(logged_output.string).not_to match(/rejected the configured access token/)
       end
     end
   end
