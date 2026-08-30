@@ -498,6 +498,13 @@ module Kitchen
       # connection, which `droplet_kit` does not wrap: Faraday raises straight
       # past `DropletKit::Error`.
       #
+      # droplet_kit 3.20 and up do install a Faraday retry middleware of their
+      # own, but it is not a substitute for this one. It skips POST, so a rate
+      # limited create is never retried by it, and it waits zero seconds
+      # between attempts -- three immediate retries inside the same rate
+      # limited moment, which cannot succeed. This one waits for the window
+      # DigitalOcean names.
+      #
       # @param allow_missing [Boolean] when true, a 404 response yields `nil`
       #   instead of raising
       # @param idempotent [Boolean] whether the call can safely be repeated. A

@@ -974,48 +974,21 @@ RSpec.describe Kitchen::Driver::Digitalocean do
     before { allow(driver).to receive(:sleep) }
 
     describe "a rate limited request" do
+      # Four in a row, because droplet_kit 3.20 and up install a Faraday retry
+      # middleware that absorbs up to three of them before the driver is told
+      # anything. The gemspec allows droplet_kit from 3.7, so the suite has to
+      # hold on both sides of that change.
       it "is retried rather than failing the run" do
         stub_droplet_create
-        stub_request(:get, droplet_url)
-          .to_return(rate_limited_response, droplet_response)
-
-        driver.create(state)
-
-        expect(state[:hostname]).to eq("1.2.3.4")
-      end
-
-      it "waits as long as DigitalOcean says the window has left" do
-        stub_droplet_create
-        stub_request(:get, droplet_url)
-          .to_return(rate_limited_response(reset_in: 12), droplet_response)
-
-        driver.create(state)
-
-        # Rounding up a partial second, so 12 or 13.
-        expect(driver).to have_received(:sleep).with(a_value_between(12, 13))
-      end
-
-      it "never waits longer than a minute, however far off the window is" do
-        stub_droplet_create
-        stub_request(:get, droplet_url)
-          .to_return(rate_limited_response(reset_in: 3600), droplet_response)
-
-        driver.create(state)
-
-        expect(driver).to have_received(:sleep).with(60)
-      end
-
-      it "falls back to a fixed pause when there is no reset header" do
-        stub_droplet_create
         stub_request(:get, droplet_url).to_return(
-          { status: 429, body: error_payload("too_many_requests", "slow down"),
-            headers: DigitalOceanAPI::JSON_HEADERS },
+          rate_limited_response, rate_limited_response,
+          rate_limited_response, rate_limited_response,
           droplet_response
         )
 
         driver.create(state)
 
-        expect(driver).to have_received(:sleep).with(60)
+        expect(state[:hostname]).to eq("1.2.3.4")
       end
 
       it "gives up once the retries are exhausted" do
@@ -1024,6 +997,52 @@ RSpec.describe Kitchen::Driver::Digitalocean do
 
         expect { driver.create(state) }
           .to raise_error(Kitchen::ActionFailed, /rate limit was still in force/)
+      end
+
+      # droplet_kit's middleware retries only :get, :delete, :head, :options
+      # and :put, and with a zero second interval -- three immediate retries
+      # inside the same rate limited moment, which achieves nothing. POST is
+      # not on its list, so the create is where the driver's own waiting can
+      # be observed whichever droplet_kit resolves.
+      describe "on a create, which droplet_kit never retries for us" do
+        let(:created) do
+          { status: 202,
+            body: { droplet: droplet_payload(status: "new", networks: :none) }.to_json,
+            headers: DigitalOceanAPI::JSON_HEADERS }
+        end
+
+        before { stub_droplet_find(droplets: [droplet_payload]) }
+
+        it "waits as long as DigitalOcean says the window has left" do
+          stub_request(:post, "#{DigitalOceanAPI::API_ROOT}/v2/droplets")
+            .to_return(rate_limited_response(reset_in: 12), created)
+
+          driver.create(state)
+
+          # Rounding a partial second up, so 12 or 13.
+          expect(driver).to have_received(:sleep).with(a_value_between(12, 13))
+        end
+
+        it "never waits longer than a minute, however far off the window is" do
+          stub_request(:post, "#{DigitalOceanAPI::API_ROOT}/v2/droplets")
+            .to_return(rate_limited_response(reset_in: 3600), created)
+
+          driver.create(state)
+
+          expect(driver).to have_received(:sleep).with(60)
+        end
+
+        it "falls back to a fixed pause when there is no reset header" do
+          stub_request(:post, "#{DigitalOceanAPI::API_ROOT}/v2/droplets").to_return(
+            { status: 429, body: error_payload("too_many_requests", "slow down"),
+              headers: DigitalOceanAPI::JSON_HEADERS },
+            created
+          )
+
+          driver.create(state)
+
+          expect(driver).to have_received(:sleep).with(60)
+        end
       end
 
       it "is retried on a create too, which a 429 guarantees did not happen" do
