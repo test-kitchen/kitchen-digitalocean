@@ -1,0 +1,151 @@
+---
+name: "Integration Tests"
+
+# These create real Droplets in a real account, so they never run automatically
+# on a pull request: secrets are not available to forks, and every run costs
+# money. Maintainers trigger them by hand, and they run weekly against main so
+# that a DigitalOcean-side change is noticed before a release rather than after.
+"on":
+  workflow_dispatch:
+    inputs:
+      suites:
+        description: "Regexp of suites to run, e.g. 'default|tags'. Empty runs all of them."
+        required: false
+        default: ""
+  schedule:
+    - cron: "0 4 * * 1"
+
+# Droplet and Droplet-name limits are per account. Two runs at once trip over
+# each other, so let an in-flight run finish rather than cancelling it.
+concurrency:
+  group: digitalocean-integration
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # A fork gets neither the secret nor the bill.
+    if: github.repository == 'test-kitchen/kitchen-digitalocean'
+    env:
+      DIGITALOCEAN_ACCESS_TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      KITCHEN_SSH_KEY: ${{ github.workspace }}/.ssh/integration
+      KITCHEN_RUN_ID: ${{ github.run_id }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.4"
+          bundler-cache: true
+
+      # Say why rather than failing forty lines later with a 401.
+      - name: Check the access token is available
+        run: |
+          if [ -z "${DIGITALOCEAN_ACCESS_TOKEN}" ]; then
+            echo "::error::DIGITALOCEAN_ACCESS_TOKEN is not set. See integration/README.md."
+            exit 1
+          fi
+
+      # A key pair per run, uploaded for the run and deleted after it. Nothing
+      # long lived is stored, and a leaked key expires with the run.
+      - name: Create and upload an SSH key
+        run: |
+          set -euo pipefail
+          mkdir -p "$(dirname "${KITCHEN_SSH_KEY}")"
+          ssh-keygen -t ed25519 -N "" -C "kitchen-digitalocean-${KITCHEN_RUN_ID}" -f "${KITCHEN_SSH_KEY}"
+
+          key_id="$(curl -sSf -X POST "https://api.digitalocean.com/v2/account/keys" \
+            -H "Authorization: Bearer ${DIGITALOCEAN_ACCESS_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg name "kitchen-integration-${KITCHEN_RUN_ID}" \
+                        --arg key "$(cat "${KITCHEN_SSH_KEY}.pub")" \
+                        '{name: $name, public_key: $key}')" \
+            | jq -r '.ssh_key.id')"
+
+          test -n "${key_id}" && test "${key_id}" != "null"
+          echo "DIGITALOCEAN_SSH_KEY_IDS=${key_id}" >> "${GITHUB_ENV}"
+          echo "Uploaded SSH key ${key_id}"
+
+      # The firewalls suite needs a firewall that still lets SSH through, so it
+      # can tell "attached correctly" apart from "locked itself out".
+      - name: Create a cloud firewall
+        run: |
+          set -euo pipefail
+          firewall_id="$(curl -sSf -X POST "https://api.digitalocean.com/v2/firewalls" \
+            -H "Authorization: Bearer ${DIGITALOCEAN_ACCESS_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n --arg name "kitchen-integration-${KITCHEN_RUN_ID}" '{
+                  name: $name,
+                  inbound_rules: [
+                    {protocol: "tcp", ports: "22",
+                     sources: {addresses: ["0.0.0.0/0", "::/0"]}}
+                  ],
+                  outbound_rules: [
+                    {protocol: "tcp", ports: "all",
+                     destinations: {addresses: ["0.0.0.0/0", "::/0"]}},
+                    {protocol: "udp", ports: "all",
+                     destinations: {addresses: ["0.0.0.0/0", "::/0"]}},
+                    {protocol: "icmp",
+                     destinations: {addresses: ["0.0.0.0/0", "::/0"]}}
+                  ]
+                }')" \
+            | jq -r '.firewall.id')"
+
+          test -n "${firewall_id}" && test "${firewall_id}" != "null"
+          echo "KITCHEN_DO_FIREWALL_ID=${firewall_id}" >> "${GITHUB_ENV}"
+          echo "Created firewall ${firewall_id}"
+
+      # The regexp goes through the environment rather than being interpolated
+      # into the command, so a dispatch input cannot become shell.
+      - name: Run the integration suites
+        working-directory: integration
+        env:
+          SUITES: ${{ github.event.inputs.suites }}
+        run: bundle exec kitchen test ${SUITES} --concurrency 4
+
+      # Destroy runs whatever happened above. A suite that leaks Droplets on
+      # failure turns a red build into a recurring bill.
+      - name: Destroy everything
+        if: always()
+        working-directory: integration
+        run: bundle exec kitchen destroy --concurrency 4
+
+      # Belt and braces. If `kitchen destroy` could not run at all -- a cancelled
+      # job, a crashed runner -- the tag is still the way back to the Droplets.
+      - name: Sweep anything left behind
+        if: always()
+        run: |
+          curl -sS -X DELETE \
+            "https://api.digitalocean.com/v2/droplets?tag_name=run-${KITCHEN_RUN_ID}" \
+            -H "Authorization: Bearer ${DIGITALOCEAN_ACCESS_TOKEN}" || true
+
+      - name: Delete the firewall and the SSH key
+        if: always()
+        run: |
+          if [ -n "${KITCHEN_DO_FIREWALL_ID:-}" ]; then
+            curl -sS -X DELETE "https://api.digitalocean.com/v2/firewalls/${KITCHEN_DO_FIREWALL_ID}" \
+              -H "Authorization: Bearer ${DIGITALOCEAN_ACCESS_TOKEN}" || true
+          fi
+          if [ -n "${DIGITALOCEAN_SSH_KEY_IDS:-}" ]; then
+            curl -sS -X DELETE "https://api.digitalocean.com/v2/account/keys/${DIGITALOCEAN_SSH_KEY_IDS}" \
+              -H "Authorization: Bearer ${DIGITALOCEAN_ACCESS_TOKEN}" || true
+          fi
+
+      - name: Upload logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: kitchen-logs
+          path: integration/.kitchen/logs/
+          retention-days: 7
+
+      - name: Warn about anything still running
+        if: failure()
+        run: |
+          echo "::warning::If the cleanup steps did not succeed, look for Droplets tagged run-${KITCHEN_RUN_ID}"
