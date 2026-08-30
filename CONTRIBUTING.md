@@ -15,7 +15,8 @@ bundle install
 ```
 
 You do not need a DigitalOcean account or an API token to work on this driver.
-The test suite never talks to the network.
+The unit suite never talks to the network. The
+[integration suites](integration/README.md) do, and are the exception.
 
 ## Rake tasks
 
@@ -29,6 +30,8 @@ The test suite never talks to the network.
 | `bundle exec rake yard` | Build the API documentation into `doc/`. |
 | `bundle exec rake yard:stats` | Report which objects are missing documentation. |
 | `bundle exec rake yard:server` | Browse the documentation at `http://localhost:8808`. |
+| `bundle exec rake integration:test` | Run the integration suites against a real DigitalOcean account. Costs money; not part of `rake`. |
+| `bundle exec rake integration:destroy` | Destroy anything the integration suites left behind. |
 
 Run a single file or example while you iterate:
 
@@ -132,6 +135,24 @@ Coverage is opt-in so the default run stays dependency light. The suite holds
 `require ... unless defined?` guards at the top of the driver, which cannot take
 both paths in a single process. Coverage is reported, not enforced in CI — treat
 a drop as a prompt to look, not as a target to game.
+
+## Integration tests
+
+Stubbing at the wire proves the driver sends the right request, not that
+DigitalOcean accepts it. The suites in [`integration/`](integration/README.md)
+close that gap: each one creates a real Droplet and asserts, on the Droplet,
+that the driver configured it as asked.
+
+```bash
+export DIGITALOCEAN_ACCESS_TOKEN=dop_v1_...
+export DIGITALOCEAN_SSH_KEY_IDS=12345678
+bundle exec rake integration:list
+bundle exec rake integration:test
+bundle exec rake integration:destroy   # after a failed run
+```
+
+They are not part of `rake default` — they cost money — and never run on a pull
+request. Maintainers run them on demand, and weekly against `main`.
 
 ## Documentation
 

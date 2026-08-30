@@ -1,0 +1,141 @@
+---
+# Integration suites for kitchen-digitalocean. Each one creates a real Droplet
+# and asserts, on the Droplet, that the driver configured it the way the suite
+# asked for.
+#
+# See integration/README.md for how to run these.
+#
+# Every ERB expression here uses single quotes inside `<%= %>`: the repository
+# lints this file as YAML, before ERB has had a chance to run.
+
+driver:
+  name: digitalocean
+  region: "<%= ENV.fetch('KITCHEN_DO_REGION', 'nyc3') %>"
+  size: "<%= ENV.fetch('KITCHEN_DO_SIZE', 's-1vcpu-1gb') %>"
+  # Every Droplet carries these two tags, so a leaked one can be found and
+  # traced back to the run that made it. Suites that set `tags` themselves have
+  # to repeat them: a suite level setting replaces the driver level one.
+  tags:
+    - kitchen-digitalocean-integration
+    - "run-<%= ENV.fetch('KITCHEN_RUN_ID', 'local') %>"
+
+# Assertions live in the provisioner rather than a verifier: the script is
+# transferred over the driver's own transport and run on the Droplet, so
+# reaching the machine at all is part of every assertion, a non-zero exit fails
+# the suite, and there is no verifier licence to satisfy.
+provisioner:
+  name: shell
+
+verifier:
+  name: shell
+  command: echo "assertions run in the provisioner"
+
+transport:
+  name: ssh
+  ssh_key: "<%= ENV.fetch('KITCHEN_SSH_KEY', '~/.ssh/id_kitchen_digitalocean') %>"
+
+platforms:
+  # A short name from PLATFORM_SLUG_MAP, which the driver resolves to a slug.
+  - name: ubuntu-24
+
+  # Deliberately not in the map. An unmapped platform name has to reach the API
+  # untouched, and only the API can say whether it did.
+  - name: debian-13-x64
+
+suites:
+  # The default path: create, converge over SSH, destroy.
+  - name: default
+    includes: [ubuntu-24]
+    provisioner:
+      script: scripts/baseline.sh
+      arguments: ["<%= ENV.fetch('KITCHEN_DO_REGION', 'nyc3') %>"]
+
+  # PLATFORM_SLUG_MAP is a claim about what DigitalOcean offers. Nothing but a
+  # real create checks that claim against the catalogue.
+  - name: image-slug
+    includes: [debian-13-x64]
+    provisioner:
+      script: scripts/image_slug.sh
+
+  # An explicit server_name has to survive to the Droplet unchanged.
+  - name: server-name
+    includes: [ubuntu-24]
+    provisioner:
+      script: scripts/server_name.sh
+      arguments: ["kitchen-do-integration-<%= ENV.fetch('KITCHEN_RUN_ID', 'local')[0, 12] %>"]
+    driver:
+      server_name: "kitchen-do-integration-<%= ENV.fetch('KITCHEN_RUN_ID', 'local')[0, 12] %>"
+
+  # tags as a YAML list.
+  - name: tags
+    includes: [ubuntu-24]
+    provisioner:
+      script: scripts/tags.sh
+    driver:
+      tags:
+        - kitchen-digitalocean-integration
+        - "run-<%= ENV.fetch('KITCHEN_RUN_ID', 'local') %>"
+        - kitchen-tag-one
+        - kitchen-tag-two
+
+  # tags as the delimited string kitchen.yml tends to produce. normalize_list
+  # splits it; only the API can confirm both halves arrived as separate tags
+  # rather than as one tag with a comma in it.
+  - name: tags-string
+    includes: [ubuntu-24]
+    provisioner:
+      script: scripts/tags.sh
+    driver:
+      tags: >-
+        kitchen-digitalocean-integration,
+        run-<%= ENV.fetch('KITCHEN_RUN_ID', 'local') %>,
+        kitchen-tag-one,
+        kitchen-tag-two
+
+  # user_data has to reach cloud-init verbatim.
+  - name: user-data
+    includes: [ubuntu-24]
+    provisioner:
+      script: scripts/user_data.sh
+    driver:
+      user_data: |
+        #cloud-config
+        runcmd:
+          - echo "user_data ran" > /etc/kitchen-user-data
+
+  - name: ipv6
+    includes: [ubuntu-24]
+    provisioner:
+      script: scripts/ipv6.sh
+    driver:
+      ipv6: true
+
+  - name: monitoring
+    includes: [ubuntu-24]
+    provisioner:
+      script: scripts/monitoring.sh
+    driver:
+      monitoring: true
+
+  # A size and region that are not the defaults. A size the region does not
+  # offer is a 422 at create time, which is the failure this suite catches.
+  - name: size-region
+    includes: [ubuntu-24]
+    provisioner:
+      script: scripts/size_region.sh
+      arguments: ["<%= ENV.fetch('KITCHEN_DO_ALT_REGION', 'sfo3') %>"]
+    driver:
+      region: "<%= ENV.fetch('KITCHEN_DO_ALT_REGION', 'sfo3') %>"
+      size: s-1vcpu-2gb
+
+  # attach_firewalls runs before the driver waits for the transport, so a
+  # Droplet that answered at all was placed behind the firewall and the firewall
+  # still permits 22. Needs a cloud firewall allowing inbound 22; CI creates one
+  # per run, and the suite reports itself skipped when there is none.
+  - name: firewalls
+    includes: [ubuntu-24]
+    provisioner:
+      script: scripts/firewalls.sh
+      arguments: ["<%= ENV.fetch('KITCHEN_DO_FIREWALL_ID', '') %>"]
+    driver:
+      firewalls: "<%= ENV.fetch('KITCHEN_DO_FIREWALL_ID', '') %>"

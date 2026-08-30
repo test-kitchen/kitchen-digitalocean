@@ -24,6 +24,25 @@ rescue LoadError
   puts "cookstyle/chefstyle is not available. (sudo) gem install cookstyle to do style checking."
 end
 
+namespace :integration do
+  # Deliberately not part of any default task, and not run on a pull request:
+  # these create real Droplets in a real account and cost real money.
+  desc "Run the integration suites against DigitalOcean (creates real Droplets)"
+  task :test do
+    Dir.chdir("integration") { sh "bundle exec kitchen test --concurrency 4" }
+  end
+
+  desc "Destroy anything the integration suites left behind"
+  task :destroy do
+    Dir.chdir("integration") { sh "bundle exec kitchen destroy --concurrency 4" }
+  end
+
+  desc "List the integration suites"
+  task :list do
+    Dir.chdir("integration") { sh "bundle exec kitchen list" }
+  end
+end
+
 # Documentation tasks are intentionally kept out of the `default` task and out
 # of CI: a missing YARD tag should never turn a pull request red.
 begin
