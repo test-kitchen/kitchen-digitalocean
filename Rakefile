@@ -7,12 +7,6 @@ require "rspec/core/rake_task"
 desc "Run the unit tests"
 RSpec::Core::RakeTask.new(:test)
 
-desc "Run the unit tests with coverage reporting"
-task :coverage do
-  ENV["COVERAGE"] = "1"
-  Rake::Task[:test].invoke
-end
-
 begin
   require "cookstyle/chefstyle"
   require "rubocop/rake_task"
