@@ -272,6 +272,15 @@ RSpec.describe Kitchen::Driver::Digitalocean do
         expect(described_class::PLATFORM_SLUG_MAP.values).to all(include("x64"))
       end
 
+      # Catches the copy-paste slip -- "ubuntu-26" => "ubuntu-24-04-x64" -- that
+      # a table of near-identical rows invites and that nothing else notices
+      # until a run comes up on the wrong distribution.
+      it "names every slug after the platform it maps" do
+        described_class::PLATFORM_SLUG_MAP.each do |platform, slug|
+          expect(slug).to start_with(platform)
+        end
+      end
+
       it "has no duplicate slugs" do
         slugs = described_class::PLATFORM_SLUG_MAP.values
 

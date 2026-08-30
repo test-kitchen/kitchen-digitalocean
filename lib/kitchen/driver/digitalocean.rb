@@ -58,34 +58,30 @@ module Kitchen
       # untouched, so any valid slug (or a numeric private image ID) can be used
       # directly as a platform name.
       #
+      # Only images DigitalOcean currently publishes belong here. A mapping onto
+      # a retired slug is worse than no mapping at all: the platform name looks
+      # supported, and the run fails at create time with an error about an image
+      # the user never named. `GET /v2/images?type=distribution` is the list
+      # this table has to agree with, and it changes -- Fedora ships twice a
+      # year and DigitalOcean carries only the newest two releases.
+      #
       # @return [Hash{String=>String}] frozen platform name to image slug map
       # @see #default_image
       PLATFORM_SLUG_MAP = {
         "almalinux-8" => "almalinux-8-x64",
         "almalinux-9" => "almalinux-9-x64",
-        "centos-7" => "centos-7-x64",
-        "centos-8" => "centos-8-x64",
+        "almalinux-10" => "almalinux-10-x64",
         "centos-stream-9" => "centos-stream-9-x64",
-        "debian-9" => "debian-9-x64",
-        "debian-10" => "debian-10-x64",
-        "debian-11" => "debian-11-x64",
-        "debian-12" => "debian-12-x64",
+        "centos-stream-10" => "centos-stream-10-x64",
         "debian-13" => "debian-13-x64",
-        "fedora-32" => "fedora-32-x64",
-        "fedora-33" => "fedora-33-x64",
-        "fedora-41" => "fedora-41-x64",
-        "fedora-42" => "fedora-42-x64",
-        "freebsd-11" => "freebsd-11-x64-zfs",
-        "freebsd-12" => "freebsd-12-x64-zfs",
-        "freebsd-13" => "freebsd-13-x64-zfs",
-        "freebsd-14" => "freebsd-14-x64-zfs",
+        "fedora-43" => "fedora-43-x64",
+        "fedora-44" => "fedora-44-x64",
         "rockylinux-8" => "rockylinux-8-x64",
         "rockylinux-9" => "rockylinux-9-x64",
-        "ubuntu-16" => "ubuntu-16-04-x64",
-        "ubuntu-18" => "ubuntu-18-04-x64",
-        "ubuntu-20" => "ubuntu-20-04-x64",
+        "rockylinux-10" => "rockylinux-10-x64",
         "ubuntu-22" => "ubuntu-22-04-x64",
         "ubuntu-24" => "ubuntu-24-04-x64",
+        "ubuntu-26" => "ubuntu-26-04-x64",
       }.freeze
 
       # Separator pattern used to turn a delimited configuration string such as
