@@ -181,6 +181,34 @@ module DigitalOceanAPI
     stub_request(:post, "#{API_ROOT}/v2/firewalls/#{id}/droplets").to_return(status: 204)
   end
 
+  # Builds a `to_return` entry for a rate limited response.
+  #
+  # DigitalOcean returns the time its window resets in a header, and
+  # droplet_kit hands that back on the exception, so the driver can wait
+  # exactly as long as it is told to.
+  #
+  # @param reset_in [Integer] seconds until the rate limit window resets
+  # @return [Hash] a WebMock response description
+  def rate_limited_response(reset_in: 30)
+    {
+      status: 429,
+      body: error_payload("too_many_requests", "API Rate limit exceeded."),
+      headers: JSON_HEADERS.merge(
+        "RateLimit-Limit" => "5000",
+        "RateLimit-Remaining" => "0",
+        "RateLimit-Reset" => (Time.now.to_i + reset_in).to_s
+      ),
+    }
+  end
+
+  # Builds a `to_return` entry carrying a Droplet.
+  #
+  # @param droplet [Hash] the Droplet payload to return
+  # @return [Hash] a WebMock response description
+  def droplet_response(droplet = droplet_payload)
+    { status: 200, body: { droplet: droplet }.to_json, headers: JSON_HEADERS }
+  end
+
   # Builds a DigitalOcean error body.
   #
   # @param id [String] machine readable error ID

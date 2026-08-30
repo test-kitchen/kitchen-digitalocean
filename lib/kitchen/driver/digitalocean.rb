@@ -18,6 +18,8 @@
 # limitations under the License.
 
 require "droplet_kit" unless defined?(DropletKit)
+# droplet_kit pulls Faraday in, but the driver names Faraday::Error itself.
+require "faraday" unless defined?(Faraday)
 require "kitchen"
 require "etc" unless defined?(Etc)
 require "socket" unless defined?(Socket)
@@ -94,6 +96,21 @@ module Kitchen
       # @return [Regexp] frozen separator pattern
       # @see #normalize_list
       LIST_SEPARATOR = /\s*,\s*|\s+/
+
+      # How many times a transient API failure is retried before it is treated
+      # as a real one.
+      #
+      # @return [Integer]
+      # @see #api_call
+      API_RETRY_LIMIT = 5
+
+      # Longest a single retry will wait, in seconds. A rate limit window can
+      # be several minutes away, and a Test Kitchen run that sits silent for
+      # that long looks hung.
+      #
+      # @return [Integer]
+      # @see #api_call
+      MAX_RETRY_DELAY = 60
 
       # Maximum length of a generated server name, chosen to stay inside the
       # 63 octet limit a single DNS label allows.
@@ -200,7 +217,10 @@ module Kitchen
         if droplet.nil?
           info("DigitalOcean instance <#{server_id}> is already gone.")
         else
-          api_call { client.droplets.delete(id: server_id) }
+          # allow_missing: a Droplet deleted out of band between the poll
+          # above and this call is the outcome we wanted, not a failure that
+          # should strand the state file and make `kitchen destroy` unusable.
+          api_call(allow_missing: true) { client.droplets.delete(id: server_id) }
           info("DigitalOcean instance <#{server_id}> destroyed.")
         end
 
@@ -249,13 +269,13 @@ module Kitchen
       # Reports what DigitalOcean currently thinks of the Droplet.
       #
       # @param state [Hash] instance state naming the Droplet
-      # @return [Hash] a Test Kitchen status hash, or the base implementation's
-      #   answer when there is no Droplet or DigitalOcean does not know it
+      # @return [Hash] a Test Kitchen status hash
       def status(state)
-        return super unless state[:server_id]
+        server_id = state[:server_id]
+        return unknown_status("Test Kitchen has no Droplet recorded for this instance") if server_id.nil?
 
-        droplet = lookup_droplet(state[:server_id])
-        return super unless droplet
+        droplet = lookup_droplet(server_id)
+        return unknown_status("DigitalOcean does not know a Droplet <#{server_id}>", server_id) if droplet.nil?
 
         {
           live: LIVE_STATUSES.include?(droplet.status),
@@ -275,7 +295,9 @@ module Kitchen
       def doctor(state) # rubocop:disable Lint/UnusedMethodArgument
         problems = token_problems
 
-        if Array(config[:ssh_key_ids]).empty?
+        # normalize_list, not Array(): the two disagree on "  " and ",", and
+        # normalize_list is what actually decides the keys sent to the API.
+        if config_list(:ssh_key_ids).empty?
           problems << "ssh_key_ids is set but empty, so the Droplet would be " \
                       "built with no key installed and the transport could " \
                       "not log in."
@@ -287,6 +309,29 @@ module Kitchen
 
       private
 
+      # Builds the status hash for a Droplet that cannot be found.
+      #
+      # This deliberately does not delegate to `Kitchen::Driver::Base#status`.
+      # Test Kitchen only grew that method in 4.1 and this gem supports 3.0
+      # upwards, so `super` here would be a `NoMethodError` on the older
+      # releases the gemspec claims to work with. Saying what is actually
+      # unknown beats the base class's "does not support status checks" in any
+      # case, since the driver does support them.
+      #
+      # @param reason [String] why the status is not known
+      # @param server_id [String, Integer, nil] the Droplet ID, if state has one
+      # @return [Hash] a Test Kitchen status hash
+      def unknown_status(reason, server_id = nil)
+        {
+          live: nil,
+          state: "unknown",
+          source: "driver",
+          resource_id: server_id&.to_s,
+          message: reason,
+          checked_at: Time.now.utc.iso8601,
+        }
+      end
+
       # Confirms the configured token is actually accepted, which is cheaper to
       # learn here than after a Droplet has been billed for.
       #
@@ -297,6 +342,10 @@ module Kitchen
       # ::StandardError, not StandardError: Kitchen defines its own
       # Kitchen::StandardError, which wins lexical constant lookup in here and
       # would narrow this rescue to Test Kitchen's own errors.
+      rescue Faraday::Error => e
+        # An unreachable API is not a rejected token, and saying so sends
+        # people off to regenerate a credential that was fine all along.
+        ["Could not reach the DigitalOcean API at #{config[:api_url]}: #{e.message}"]
       rescue ::StandardError => e
         ["DigitalOcean rejected the configured access token: #{e.message}"]
       end
@@ -342,15 +391,15 @@ module Kitchen
           image: config[:image],
           size: config[:size],
           monitoring: config[:monitoring],
-          ssh_keys: normalize_list(config[:ssh_key_ids]),
+          ssh_keys: config_list(:ssh_key_ids),
           private_networking: config[:private_networking],
           ipv6: config[:ipv6],
           user_data: config[:user_data],
-          vpc_uuid: config[:vpcs],
-          tags: normalize_list(config[:tags])
+          vpc_uuid: configured_vpc_uuid,
+          tags: config_list(:tags)
         )
 
-        response = api_call { client.droplets.create(droplet) }
+        response = api_call(idempotent: false) { client.droplets.create(droplet) }
 
         unless response.is_a?(DropletKit::Droplet)
           raise ActionFailed, "Could not create the DigitalOcean Droplet: the " \
@@ -402,12 +451,7 @@ module Kitchen
         return if config[:firewalls].nil?
 
         debug("trying to add the firewall by id")
-        firewall_ids = normalize_list(config[:firewalls])
-
-        if firewall_ids.nil?
-          warn("firewalls attribute is not a String or Array, ignoring")
-          return
-        end
+        firewall_ids = config_list(:firewalls)
 
         debug("firewall : #{firewall_ids.inspect}")
 
@@ -443,20 +487,97 @@ module Kitchen
       end
 
       # Runs an API call, converting `droplet_kit` failures into Test Kitchen
-      # errors so users see an actionable message instead of a raw backtrace.
+      # errors so users see an actionable message instead of a raw backtrace,
+      # and riding out the failures the live API produces in normal operation.
+      #
+      # Two of those are worth naming, because neither is exotic. DigitalOcean
+      # allows 250 requests a minute; a `kitchen test` across a dozen platforms
+      # polls hard enough to meet that ceiling, and the answer is to wait for
+      # the window rather than to fail with a Droplet already running. And a
+      # poll that can run for ten minutes will eventually meet a reset
+      # connection, which `droplet_kit` does not wrap: Faraday raises straight
+      # past `DropletKit::Error`.
+      #
+      # droplet_kit 3.20 and up do install a Faraday retry middleware of their
+      # own, but it is not a substitute for this one. It skips POST, so a rate
+      # limited create is never retried by it, and it waits zero seconds
+      # between attempts -- three immediate retries inside the same rate
+      # limited moment, which cannot succeed. This one waits for the window
+      # DigitalOcean names.
       #
       # @param allow_missing [Boolean] when true, a 404 response yields `nil`
       #   instead of raising
+      # @param idempotent [Boolean] whether the call can safely be repeated. A
+      #   dropped connection may still have delivered the request, so a create
+      #   is never retried: a second attempt would bill for a second Droplet.
       # @yield the API call to run
       # @return [Object, nil] whatever the block returns, or `nil` for a
       #   tolerated 404
       # @raise [Kitchen::ActionFailed] if the API call fails
-      def api_call(allow_missing: false)
-        yield
-      rescue DropletKit::Error => e
-        return nil if allow_missing && e.message.to_s.start_with?("404")
+      def api_call(allow_missing: false, idempotent: true)
+        attempts = 0
 
-        raise ActionFailed, "The DigitalOcean API request failed: #{e.message}"
+        begin
+          yield
+        rescue DropletKit::RateLimitReached => e
+          # A rate limited request definitely did not reach the account, so
+          # retrying is safe whether or not the call is idempotent.
+          attempts += 1
+          if attempts > API_RETRY_LIMIT
+            raise ActionFailed, "The DigitalOcean API rate limit was still in force " \
+              "after #{API_RETRY_LIMIT} retries: #{e.message}"
+          end
+
+          delay = rate_limit_delay(e)
+          info("DigitalOcean rate limit reached, retrying in #{delay} seconds")
+          sleep(delay)
+          retry
+        rescue Faraday::Error => e
+          unless idempotent
+            raise ActionFailed, "The DigitalOcean API could not be reached: #{e.message}. " \
+              "The request may still have been delivered, so check the account for a " \
+              "Droplet before retrying."
+          end
+
+          attempts += 1
+          if attempts > API_RETRY_LIMIT
+            raise ActionFailed, "The DigitalOcean API could not be reached after " \
+              "#{API_RETRY_LIMIT} retries: #{e.message}"
+          end
+
+          delay = retry_delay(attempts)
+          info("Could not reach the DigitalOcean API (#{e.message}), retrying in #{delay} seconds")
+          sleep(delay)
+          retry
+        rescue DropletKit::Error => e
+          return nil if allow_missing && e.message.to_s.start_with?("404")
+
+          raise ActionFailed, "The DigitalOcean API request failed: #{e.message}"
+        end
+      end
+
+      # How long to wait before retrying a rate limited request.
+      #
+      # DigitalOcean returns the time its window resets in a header, which
+      # `droplet_kit` hands back on the exception. A fixed pause is the
+      # fallback, so a missing or unparsable header does not turn into a busy
+      # loop.
+      #
+      # @param error [DropletKit::RateLimitReached] the error that was raised
+      # @return [Integer] seconds to sleep, at most {MAX_RETRY_DELAY}
+      def rate_limit_delay(error)
+        reset_at = error.reset_at.to_i
+        seconds = reset_at > 0 ? (Time.at(reset_at) - Time.now).ceil : MAX_RETRY_DELAY
+
+        seconds.clamp(1, MAX_RETRY_DELAY)
+      end
+
+      # Backs off between retries of a request that could not be delivered.
+      #
+      # @param attempt [Integer] the attempt that just failed
+      # @return [Integer] seconds to sleep, at most {MAX_RETRY_DELAY}
+      def retry_delay(attempt)
+        (2**attempt).clamp(1, MAX_RETRY_DELAY)
       end
 
       # Polls `block` on a fixed interval until it returns a truthy value.
@@ -504,6 +625,41 @@ module Kitchen
         when String then value.split(LIST_SEPARATOR).reject(&:empty?)
         when Numeric then [value.to_s]
         end
+      end
+
+      # Reads a list shaped setting, warning rather than silently sending
+      # `null` when the value is of a type that cannot be read as a list.
+      #
+      # `tags: {env: prod}` in a `kitchen.yml` used to serialize as
+      # `"tags": null`, which DigitalOcean accepts and quietly ignores.
+      #
+      # @param key [Symbol] the configuration key to read
+      # @return [Array<String>] the parsed list, empty if it could not be read
+      # @see #normalize_list
+      def config_list(key)
+        list = normalize_list(config[key])
+        return list unless list.nil?
+
+        warn("#{key} attribute is not a String or Array, ignoring")
+        []
+      end
+
+      # Resolves `config[:vpcs]` to the single VPC UUID the API takes.
+      #
+      # The setting is plural and every other list shaped setting here accepts
+      # a YAML list, so people write one. Sending that array as `vpc_uuid`
+      # earns an opaque 422, which is a poor answer to a reasonable guess.
+      #
+      # @return [String, nil] the VPC UUID, or `nil` when none is configured
+      def configured_vpc_uuid
+        uuids = config_list(:vpcs)
+
+        if uuids.length > 1
+          warn("DigitalOcean places a Droplet in one VPC. Using #{uuids.first} " \
+               "and ignoring the rest.")
+        end
+
+        uuids.first
       end
 
       # Writes the resolved Droplet configuration to the debug log.

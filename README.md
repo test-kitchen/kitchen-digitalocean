@@ -139,7 +139,7 @@ per platform or per suite.
 | `monitoring` | `false` | Install the DigitalOcean metrics agent. |
 | `ipv6` | `false` | Enable IPv6 networking. |
 | `private_networking` | `true` | Enable legacy private networking. Prefer `vpcs`. |
-| `vpcs` | none | UUID of the VPC to place the Droplet in. |
+| `vpcs` | none | UUID of the VPC to place the Droplet in. A list is accepted, but DigitalOcean places a Droplet in one VPC, so only the first is used. |
 | `tags` | none | Tags to apply. String or list. |
 | `firewalls` | none | Cloud firewall IDs to attach the Droplet to. String or list. |
 | `user_data` | none | Cloud-init user data, run on first boot. |
@@ -301,6 +301,22 @@ The token is wrong, expired, or read-only. Generate a new one with write scope.
 The API rejected the Droplet. The message says why — usually a `size` that is not
 offered in the chosen `region`, or an image slug that does not exist. Check with
 `doctl compute size list` and `doctl compute image list --public`.
+
+### `The DigitalOcean API rate limit was still in force after 5 retries`
+
+DigitalOcean allows 250 requests a minute. A large `kitchen test` matrix polls
+hard enough to reach that, and the driver waits out the window and retries on
+its own — this message means it was still rate limited after five waits. Run
+fewer instances at once with `kitchen test --concurrency`, or raise
+`server_wait_interval` so each instance polls less often.
+
+### `The DigitalOcean API could not be reached: ...`
+
+A network or TLS failure rather than an API error. Lookups and deletes are
+retried automatically; a Droplet **create** is not, because a dropped
+connection does not tell you whether the request arrived. If you see this
+during `kitchen create`, check the control panel for a Droplet before you
+retry, so you do not pay for two.
 
 ### `Timed out after 600 seconds waiting for ... to get a public IP address`
 
