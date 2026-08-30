@@ -168,6 +168,15 @@ this cannot drift silently. Adding a mapping is a `feat:` change.
 Nothing needs to be added for a slug to work at all: an unmapped platform name is
 passed to the API untouched.
 
+Only images DigitalOcean currently publishes belong in the table. A mapping onto
+a retired slug is worse than no mapping: the platform name looks supported, and
+the run fails at create time with an error naming an image the user never wrote.
+`GET /v2/images?type=distribution` — `doctl compute image list --public` — is
+the list the table has to agree with, and it moves: Fedora ships twice a year and
+DigitalOcean carries only the two newest releases. Removing an entry that has
+aged out is a `feat:` change too, since it goes in the changelog alongside
+whatever replaced it.
+
 ## Style
 
 ```bash

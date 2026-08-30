@@ -165,35 +165,30 @@ driver:
 ### Platforms and images
 
 The platform name is what picks the image. Short names are translated to the
-matching DigitalOcean slug:
+matching DigitalOcean slug. Every name below maps onto an image DigitalOcean
+currently publishes:
 
 | Platform name | Image slug |
 | --- | --- |
 | `almalinux-8` | `almalinux-8-x64` |
 | `almalinux-9` | `almalinux-9-x64` |
-| `centos-7` | `centos-7-x64` |
-| `centos-8` | `centos-8-x64` |
+| `almalinux-10` | `almalinux-10-x64` |
 | `centos-stream-9` | `centos-stream-9-x64` |
-| `debian-9` | `debian-9-x64` |
-| `debian-10` | `debian-10-x64` |
-| `debian-11` | `debian-11-x64` |
-| `debian-12` | `debian-12-x64` |
+| `centos-stream-10` | `centos-stream-10-x64` |
 | `debian-13` | `debian-13-x64` |
-| `fedora-32` | `fedora-32-x64` |
-| `fedora-33` | `fedora-33-x64` |
-| `fedora-41` | `fedora-41-x64` |
-| `fedora-42` | `fedora-42-x64` |
-| `freebsd-11` | `freebsd-11-x64-zfs` |
-| `freebsd-12` | `freebsd-12-x64-zfs` |
-| `freebsd-13` | `freebsd-13-x64-zfs` |
-| `freebsd-14` | `freebsd-14-x64-zfs` |
+| `fedora-43` | `fedora-43-x64` |
+| `fedora-44` | `fedora-44-x64` |
 | `rockylinux-8` | `rockylinux-8-x64` |
 | `rockylinux-9` | `rockylinux-9-x64` |
-| `ubuntu-16` | `ubuntu-16-04-x64` |
-| `ubuntu-18` | `ubuntu-18-04-x64` |
-| `ubuntu-20` | `ubuntu-20-04-x64` |
+| `rockylinux-10` | `rockylinux-10-x64` |
 | `ubuntu-22` | `ubuntu-22-04-x64` |
 | `ubuntu-24` | `ubuntu-24-04-x64` |
+| `ubuntu-26` | `ubuntu-26-04-x64` |
+
+DigitalOcean retires images as distributions go end of life — it carries only
+the two newest Fedora releases, and one Debian — so a name that worked a year
+ago may not be in the table today. `doctl compute image list --public` is the
+authoritative list.
 
 Anything that is not in that list is passed to the API untouched, so you can use
 a full slug or a private image ID as the platform name directly:
