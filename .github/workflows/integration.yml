@@ -101,9 +101,13 @@ jobs:
           echo "KITCHEN_DO_FIREWALL_ID=${firewall_id}" >> "${GITHUB_ENV}"
           echo "Created firewall ${firewall_id}"
 
+      # The regexp goes through the environment rather than being interpolated
+      # into the command, so a dispatch input cannot become shell.
       - name: Run the integration suites
         working-directory: integration
-        run: bundle exec kitchen test ${{ github.event.inputs.suites }} --concurrency 4
+        env:
+          SUITES: ${{ github.event.inputs.suites }}
+        run: bundle exec kitchen test ${SUITES} --concurrency 4
 
       # Destroy runs whatever happened above. A suite that leaks Droplets on
       # failure turns a red build into a recurring bill.
