@@ -23,7 +23,6 @@ The test suite never talks to the network.
 | --- | --- |
 | `bundle exec rake` | Run tests and style. The same gates CI applies. |
 | `bundle exec rake test` | Run the unit tests. |
-| `bundle exec rake coverage` | Run the unit tests with coverage reporting. |
 | `bundle exec rake style` | Run Cookstyle/Chefstyle. |
 | `bundle exec rake style:auto_correct` | Fix the style offences that can be fixed automatically. |
 | `bundle exec rake yard` | Build the API documentation into `doc/`. |
@@ -50,7 +49,7 @@ spec/
 │   ├── digitalocean_spec.rb          the driver
 │   └── digitalocean_version_spec.rb  the version constant
 ├── readme_spec.rb                    keeps README tables in sync with the code
-├── spec_helper.rb                    RSpec, WebMock and coverage configuration
+├── spec_helper.rb                    RSpec and WebMock configuration
 └── support/
     ├── digitalocean_api.rb           API payload builders and request stubs
     └── kitchen_helpers.rb            builds a driver the way Test Kitchen does
@@ -120,18 +119,6 @@ end
 
 The suite runs in random order and must pass at any seed. If a change makes it
 order dependent, `bundle exec rspec --seed 1234` will usually surface it.
-
-### Coverage
-
-```bash
-bundle exec rake coverage
-```
-
-Coverage is opt-in so the default run stays dependency light. The suite holds
-100% line coverage; the only branches it does not reach are the
-`require ... unless defined?` guards at the top of the driver, which cannot take
-both paths in a single process. Coverage is reported, not enforced in CI — treat
-a drop as a prompt to look, not as a target to game.
 
 ## Documentation
 

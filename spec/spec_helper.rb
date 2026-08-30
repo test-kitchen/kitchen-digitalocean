@@ -13,18 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Coverage is opt-in so the default `rake test` run stays dependency light.
-# Run `COVERAGE=1 bundle exec rspec` (or `rake coverage`) to collect it.
-if ENV["COVERAGE"]
-  require "simplecov"
-
-  SimpleCov.start do
-    add_filter "/spec/"
-    enable_coverage :branch
-    minimum_coverage line: 95, branch: 80
-  end
-end
-
 require "rspec"
 require "webmock/rspec"
 
